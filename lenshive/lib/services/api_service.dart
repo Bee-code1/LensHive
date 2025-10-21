@@ -9,8 +9,8 @@ class ApiService {
   static const String baseUrl = 'http://localhost:8000/api';
   
   // API endpoints
-  static const String loginEndpoint = '/auth/login';
-  static const String registerEndpoint = '/auth/register';
+  static const String loginEndpoint = '/auth/login/';
+  static const String registerEndpoint = '/auth/register/';
 
   /// Login user with email and password
   /// Returns User object if successful, throws exception if failed

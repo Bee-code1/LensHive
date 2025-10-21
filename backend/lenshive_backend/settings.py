@@ -122,6 +122,9 @@ REST_FRAMEWORK = {
     ],
 }
 
+# URL Configuration
+APPEND_SLASH = True  # This ensures URLs end with a trailing slash
+
 # CORS Settings - Allow Flutter app to connect
 CORS_ALLOW_ALL_ORIGINS = True  # For development only
 CORS_ALLOW_CREDENTIALS = True
