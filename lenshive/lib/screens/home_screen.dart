@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/home_provider.dart';
 import '../widgets/custom_search_bar.dart';
 import '../widgets/category_tabs.dart';
@@ -161,6 +162,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           // Handle image upload for AI search
                         },
                       ),
+              ),
+
+              // Find My Lenses Button
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 8.r),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => context.go('/quiz/step1'),
+                      icon: Icon(
+                        Icons.search,
+                        size: 20.r,
+                      ),
+                      label: Text(
+                        'Find My Lenses',
+                        style: TextStyle(
+                          fontSize: 16.r,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 16.r),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
 
               // Category Tabs

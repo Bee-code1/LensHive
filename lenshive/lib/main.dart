@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'providers/theme_provider.dart';
-import 'screens/splash_screen.dart';
+import 'app_router.dart';
 
 void main() async {
   // Ensure Flutter binding is initialized
@@ -30,9 +30,10 @@ class MyApp extends ConsumerWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           title: 'LensHive',
           debugShowCheckedModeBanner: false,
+          routerConfig: appRouter,
       
           // Light theme configuration
           theme: ThemeData(
@@ -78,9 +79,6 @@ class MyApp extends ConsumerWidget {
       
           // Use theme mode from provider
           themeMode: themeMode,
-      
-          // Start with splash screen
-          home: const SplashScreen()
         );
       },
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'home_screen.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 
 /// Registration Screen Widget with Riverpod State Management
@@ -68,13 +68,8 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
           ),
         );
 
-        // Navigate to home screen and remove all previous routes
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
-          (route) => false,
-        );
+        // Navigate to home screen
+        context.go('/home');
       } else {
         // Get error message from state
         final errorMessage = ref.read(authErrorProvider);
@@ -451,7 +446,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                             GestureDetector(
                               onTap: () {
                                 // Navigate back to login screen
-                                Navigator.pop(context);
+                                context.go('/login');
                               },
                               child: Text(
                                 'Login',
