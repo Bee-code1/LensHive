@@ -46,6 +46,9 @@ dependencies:
   
   # Local storage for persistent data
   shared_preferences: ^2.2.2
+  
+  # Shimmer effect for skeleton loading
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

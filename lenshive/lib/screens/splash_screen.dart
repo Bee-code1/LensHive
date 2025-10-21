@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../providers/splash_provider.dart';
+import '../providers/auth_provider.dart';
 import 'login_screen.dart';
+import 'home_screen.dart';
 
 /// Splash screen with responsive design and floating icons
 class SplashScreen extends ConsumerStatefulWidget {
@@ -127,15 +129,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Watch authentication state
+    final isAuthenticated = ref.watch(isAuthenticatedProvider);
+
     // Listen to splash state changes
     ref.listen<SplashState>(splashProvider, (previous, next) {
       if (next == SplashState.completed) {
-        // Always navigate to login screen (Home screen removed for now)
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const LoginScreen(),
-          ),
-        );
+        // Navigate based on authentication status
+        if (isAuthenticated) {
+          // User is logged in, go to home screen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
+            ),
+          );
+        } else {
+          // User is not logged in, go to login screen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const LoginScreen(),
+            ),
+          );
+        }
       }
     });
 

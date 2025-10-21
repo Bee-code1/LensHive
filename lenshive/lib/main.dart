@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'providers/theme_provider.dart';
 import 'screens/splash_screen.dart';
 
 void main() async {
@@ -15,11 +16,14 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch theme mode from provider
+    final themeMode = ref.watch(themeProvider);
+
     // Initialize ScreenUtil for responsive design
     return ScreenUtilInit(
       designSize: const Size(375, 812), // iPhone 13 Pro size as base
@@ -48,31 +52,32 @@ class MyApp extends StatelessWidget {
           ),
       
           // Dark theme configuration - Professional & Elegant
-          // darkTheme: ThemeData(
-          //   useMaterial3: true,
-          //   brightness: Brightness.dark,
-          //   colorScheme: const ColorScheme.dark(
-          //     primary: Color(0xFF00D9FF), // Elegant Cyan
-          //     secondary: Color(0xFF7C3AED), // Deep Purple accent
-          //     surface: Color(0xFF1E1E2E), // Deep charcoal surface
-          //     background: Color(0xFF0F0F1A), // Very dark background
-          //     onPrimary: Color(0xFF000000), // Black text on primary
-          //     onSecondary: Colors.white,
-          //     onSurface: Color(0xFFE4E4E7), // Soft white for text
-          //     onBackground: Color(0xFFE4E4E7),
-          //     error: Color(0xFFFF6B6B),
-          //   ),
-          //   scaffoldBackgroundColor: const Color(0xFF0F0F1A),
-          //   cardColor: const Color(0xFF1E1E2E),
-          //   appBarTheme: const AppBarTheme(
-          //     centerTitle: true,
-          //     elevation: 0,
-          //     backgroundColor: Color(0xFF0F0F1A),
-          //   ),
-          // ),
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            colorScheme: ColorScheme.dark(
+              primary: const Color(0xFF64B5F6), // Lighter blue for better contrast
+              secondary: const Color(0xFF81D4FA), // Light blue accent
+              surface: const Color(0xFF202124), // Slightly lighter surface
+              background: const Color(0xFF1A1A1A), // Dark background
+              onPrimary: Colors.white,
+              onSecondary: Colors.white,
+              onSurface: Colors.white.withOpacity(0.87), // More visible text
+              onBackground: Colors.white.withOpacity(0.87),
+              error: const Color(0xFFEF5350),
+              tertiary: const Color(0xFF80DEEA), // Accent color for highlights
+            ),
+            scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+            cardColor: const Color(0xFF202124),
+            appBarTheme: const AppBarTheme(
+              centerTitle: true,
+              elevation: 0,
+              backgroundColor: Color(0xFF121212),
+            ),
+          ),
       
-          // Use system theme mode (automatically switches based on device settings)
-          themeMode: ThemeMode.system,
+          // Use theme mode from provider
+          themeMode: themeMode,
       
           // Start with splash screen
           home: const SplashScreen()

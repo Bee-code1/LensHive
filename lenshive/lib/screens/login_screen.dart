@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'registration_screen.dart';
+import 'home_screen.dart';
 import '../providers/auth_provider.dart';
 import '../services/storage_service.dart';
 
@@ -77,22 +78,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Get user from state
         final user = ref.read(currentUserProvider);
         
-        // Show success message (Home screen temporarily removed)
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Welcome back, ${user?.fullName ?? "User"}! (Home screen coming soon)'),
+            content: Text('Welcome back, ${user?.fullName ?? "User"}!'),
             backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
+            duration: const Duration(seconds: 2),
           ),
         );
 
-        // TODO: Navigate to home screen when ready
-        // Navigator.of(context).pushAndRemoveUntil(
-        //   MaterialPageRoute(
-        //     builder: (context) => const HomeScreen(),
-        //   ),
-        //   (route) => false,
-        // );
+        // Navigate to home screen and remove all previous routes
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const HomeScreen(),
+          ),
+          (route) => false,
+        );
       } else {
         // Get error message from state
         final errorMessage = ref.read(authErrorProvider);
