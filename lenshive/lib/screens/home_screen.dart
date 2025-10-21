@@ -29,7 +29,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // (theme check removed — use Theme.of(context) inline where needed)
 
     // Function to get the current screen based on index
-    Widget _getScreen(int index) {
+    Widget getScreen(int index) {
       switch (index) {
         case 0:
           return _buildHomeScreen(homeState, homeNotifier, cartItemCount);
@@ -48,7 +48,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: _getScreen(_currentNavIndex),
+      body: getScreen(_currentNavIndex),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentNavIndex,
         onTap: (index) {

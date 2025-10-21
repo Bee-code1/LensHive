@@ -6,8 +6,18 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'email', 'created_at']
+        fields = ['id', 'full_name', 'email', 'role', 'is_active', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Add permissions based on role
+        data['permissions'] = {
+            'can_manage_users': instance.role == 'admin',
+            'can_manage_products': instance.role in ['admin', 'staff'],
+            'can_view_analytics': instance.role in ['admin', 'staff'],
+        }
+        return data
 
 class RegisterSerializer(serializers.ModelSerializer):
     """Serializer for user registration"""

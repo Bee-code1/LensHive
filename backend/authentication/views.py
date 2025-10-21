@@ -116,6 +116,18 @@ def logout(request):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def verify_token(request):
+    """
+    Verify authentication token
+    GET /api/auth/verify
+    Headers: Authorization: Token <token>
+    """
+    # Token is already verified by IsAuthenticated permission
+    user_data = UserSerializer(request.user).data
+    return Response(user_data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def test_connection(request):
     """Test API connection"""

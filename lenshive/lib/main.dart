@@ -58,12 +58,10 @@ class MyApp extends ConsumerWidget {
             colorScheme: ColorScheme.dark(
               primary: const Color(0xFF64B5F6), // Lighter blue for better contrast
               secondary: const Color(0xFF81D4FA), // Light blue accent
-              surface: const Color(0xFF202124), // Slightly lighter surface
-              background: const Color(0xFF1A1A1A), // Dark background
+              surface: const Color(0xFF202124), // Dark background
               onPrimary: Colors.white,
               onSecondary: Colors.white,
-              onSurface: Colors.white.withOpacity(0.87), // More visible text
-              onBackground: Colors.white.withOpacity(0.87),
+              onSurface: Colors.white.withOpacity(0.87),
               error: const Color(0xFFEF5350),
               tertiary: const Color(0xFF80DEEA), // Accent color for highlights
             ),

@@ -400,7 +400,7 @@ class ProfileScreen extends ConsumerWidget {
           Switch(
             value: isDarkMode,
             onChanged: onChanged,
-            activeColor: const Color(0xFF0A83BC),
+            activeThumbColor: const Color(0xFF0A83BC),
           ),
         ],
       ),
