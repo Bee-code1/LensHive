@@ -1,6 +1,4 @@
-# 🎯 LensHive - Camera Rental Platform
-
-A modern camera rental platform built with Flutter (Frontend) and Django (Backend) with MySQL database.
+# 🎯 LensHive 
 
 ## 📱 Features
 
@@ -274,4 +272,5 @@ For support, email your-email@example.com or create an issue in the repository.
 ---
 
 **Made with ❤️ for LensHive FYP Project**
+
 
