@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+<<<<<<< HEAD
+import '../constants/app_colors.dart';
+import 'home_screen.dart';
+=======
 import 'package:go_router/go_router.dart';
+>>>>>>> 8471b69 (feat: Implement Lens Questionnaire Feature with GoRouter integration)
 import '../providers/auth_provider.dart';
 
 /// Registration Screen Widget with Riverpod State Management
@@ -221,7 +226,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                               fontSize: 14.r,
                             ),
                             filled: true,
-                            fillColor: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5F5F5),
+                            fillColor: isDark ? AppColors.inputBackgroundDark : AppColors.inputBackgroundLight,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.r),
                               borderSide: BorderSide.none,
@@ -262,7 +267,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                               fontSize: 14.r,
                             ),
                             filled: true,
-                            fillColor: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5F5F5),
+                            fillColor: isDark ? AppColors.inputBackgroundDark : AppColors.inputBackgroundLight,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.r),
                               borderSide: BorderSide.none,
@@ -318,7 +323,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                               fontSize: 14.r,
                             ),
                             filled: true,
-                            fillColor: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5F5F5),
+                            fillColor: isDark ? AppColors.inputBackgroundDark : AppColors.inputBackgroundLight,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.r),
                               borderSide: BorderSide.none,
@@ -373,7 +378,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                               fontSize: 14.r,
                             ),
                             filled: true,
-                            fillColor: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5F5F5),
+                            fillColor: isDark ? AppColors.inputBackgroundDark : AppColors.inputBackgroundLight,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.r),
                               borderSide: BorderSide.none,
