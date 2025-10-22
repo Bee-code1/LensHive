@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'constants/app_theme.dart';
 import 'providers/theme_provider.dart';
 import 'screens/splash_screen.dart';
 
@@ -34,23 +35,10 @@ class MyApp extends ConsumerWidget {
           title: 'LensHive',
           debugShowCheckedModeBanner: false,
       
-          // Light theme configuration
-          theme: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.light,
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF0A83BC), // Professional Blue
-              brightness: Brightness.light,
-            ),
-            scaffoldBackgroundColor: Colors.white,
-            cardColor: Colors.white,
-            appBarTheme: const AppBarTheme(
-              centerTitle: true,
-              elevation: 0,
-              backgroundColor: Colors.white,
-            ),
-          ),
+          // Light theme configuration using AppTheme
+          theme: AppTheme.lightTheme,
       
+<<<<<<< HEAD
           // Dark theme configuration - Professional & Elegant
           darkTheme: ThemeData(
             useMaterial3: true,
@@ -73,6 +61,10 @@ class MyApp extends ConsumerWidget {
               backgroundColor: Color(0xFF121212),
             ),
           ),
+=======
+          // Dark theme configuration using AppTheme
+          darkTheme: AppTheme.darkTheme,
+>>>>>>> 6c7878c48db6bd00a3c26ebf8397671bf2e9ec8d
       
           // Use theme mode from provider
           themeMode: themeMode,

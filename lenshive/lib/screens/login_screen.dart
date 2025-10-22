@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../constants/app_colors.dart';
 import 'registration_screen.dart';
 import 'home_screen.dart';
 import '../providers/auth_provider.dart';
@@ -222,7 +223,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               fontSize: 14.r,
                             ),
                             filled: true,
-                            fillColor: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5F5F5),
+                            fillColor: isDark ? AppColors.inputBackgroundDark : AppColors.inputBackgroundLight,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.r),
                               borderSide: BorderSide.none,
@@ -277,7 +278,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               fontSize: 14.r,
                             ),
                             filled: true,
-                            fillColor: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5F5F5),
+                            fillColor: isDark ? AppColors.inputBackgroundDark : AppColors.inputBackgroundLight,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.r),
                               borderSide: BorderSide.none,

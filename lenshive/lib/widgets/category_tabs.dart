@@ -33,13 +33,13 @@ class CategoryTabs extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? Theme.of(context).primaryColor.withOpacity(0.1)
-                      : Colors.transparent,
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(20.r),
                   border: Border.all(
                     color: isSelected
-                        ? Theme.of(context).primaryColor
-                        : Theme.of(context).dividerColor,
+                        ? Theme.of(context).colorScheme.primary.withOpacity(0.9)
+                        : Theme.of(context).colorScheme.primary.withOpacity(0.3),
                     width: 1.5,
                   ),
                 ),
@@ -47,8 +47,8 @@ class CategoryTabs extends StatelessWidget {
                   category,
                   style: TextStyle(
                     color: isSelected 
-                        ? Theme.of(context).primaryColor 
-                        : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onSurface,
                     fontSize: 14.r,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   ),
