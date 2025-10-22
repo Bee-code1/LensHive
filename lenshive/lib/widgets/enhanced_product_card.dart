@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../constants/app_colors.dart';
 import '../models/product_model.dart';
 
 /// Enhanced Product Card Widget
@@ -38,14 +39,18 @@ class EnhancedProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Product Image with badges and Try On button
-            Expanded(
+            SizedBox(
+              height: 220.r,  // Fixed height for consistent image size
               child: Stack(
                 children: [
                   // Image Container
                   Container(
                     width: double.infinity,
+                    height: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.grey[50],
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[900]
+                          : Colors.grey[50],
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(16.r),
                         topRight: Radius.circular(16.r),
@@ -83,14 +88,14 @@ class EnhancedProductCard extends StatelessWidget {
                           vertical: 4.r,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4A90E2),
+                          color: AppColors.bestsellerBadge,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Text(
-                          'Bestseller',
+                          'Best Seller',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 10.r,
+                            fontSize: 12.r,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -108,7 +113,7 @@ class EnhancedProductCard extends StatelessWidget {
                           vertical: 4.r,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50),
+                          color: AppColors.newBadge,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Text(
@@ -136,7 +141,9 @@ class EnhancedProductCard extends StatelessWidget {
                             vertical: 8.r,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.grey[800]!.withOpacity(0.9),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[800]!.withOpacity(0.9)
+                                : Theme.of(context).colorScheme.primary.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(20.r),
                           ),
                           child: Row(
@@ -172,13 +179,13 @@ class EnhancedProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Product Name
+                    // Product Name
                   Text(
                     product.name,
                     style: TextStyle(
                       fontSize: 14.r,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[900],
+                      color: Theme.of(context).colorScheme.onSurface,
                       height: 1.2,
                     ),
                     maxLines: 1,
@@ -192,9 +199,9 @@ class EnhancedProductCard extends StatelessWidget {
                     Text(
                       product.brand!.toUpperCase(),
                       style: TextStyle(
-                        fontSize: 11.r,
+                        fontSize: 17.r,
                         fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.primary,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -211,17 +218,15 @@ class EnhancedProductCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15.r,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.secondary,
                         ),
-                      ),
-
-                      // Add to Cart Button
+                      ),                      // Add to Cart Button
                       GestureDetector(
                         onTap: onAddToCart ?? () {},
                         child: Container(
                           padding: EdgeInsets.all(6.r),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4A90E2),
+                            color: AppColors.bestsellerBadge,
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Icon(
@@ -243,11 +248,15 @@ class EnhancedProductCard extends StatelessWidget {
   }
 
   Widget _buildPlaceholder() {
-    return Center(
-      child: Icon(
-        Icons.image_outlined,
-        size: 50.r,
-        color: Colors.grey[300],
+    return Builder(
+      builder: (context) => Center(
+        child: Icon(
+          Icons.image_outlined,
+          size: 50.r,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[700]
+              : Colors.grey[300],
+        ),
       ),
     );
   }

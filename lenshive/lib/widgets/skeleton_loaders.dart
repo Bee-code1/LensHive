@@ -16,9 +16,10 @@ class SkeletonShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+      highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
       child: child,
     );
   }
@@ -39,11 +40,12 @@ class SkeletonBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.grey[300],
+        color: isDark ? Colors.grey[800] : Colors.grey[300],
         borderRadius: borderRadius ?? BorderRadius.circular(8.r),
       ),
     );
@@ -59,11 +61,11 @@ class SkeletonProductCard extends StatelessWidget {
     return SkeletonShimmer(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -147,7 +149,9 @@ class SkeletonSearchBar extends StatelessWidget {
         margin: EdgeInsets.symmetric(horizontal: 16.r, vertical: 8.r),
         height: 48.r,
         decoration: BoxDecoration(
-          color: Colors.grey[300],
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[800]
+              : Colors.grey[300],
           borderRadius: BorderRadius.circular(25.r),
         ),
       ),

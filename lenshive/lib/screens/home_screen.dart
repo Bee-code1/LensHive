@@ -77,16 +77,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     // LensHive Logo Image
                     Image.asset(
                       'assets/images/lenshive_logo.png',
-                      width: 32.r,
-                      height: 32.r,
+                      width: 50.r,
+                      height: 60.r,
                       fit: BoxFit.contain,
                     ),
                     SizedBox(width: 8.r),
                     Text(
                       'LensHive',
                       style: TextStyle(
-                        color: const Color(0xFF0A83BC),
-                        fontSize: 20.r,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Theme.of(context).colorScheme.primary,
+                        fontSize: 17.r,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -119,22 +121,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 vertical: 2.r,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4A90E2),
+                                color: Theme.of(context).colorScheme.primary,
                                 borderRadius: BorderRadius.circular(10.r),
                                 border: Border.all(
-                                  color: const Color(0xFFF5F5F5),
-                                  width: 2,
+                                  color: Theme.of(context).colorScheme.surface,
+                                  width: 1.r,
                                 ),
                               ),
                               constraints: BoxConstraints(
-                                minWidth: 20.r,
-                                minHeight: 20.r,
+                                minWidth: 18.r,
+                                minHeight: 18.r,
                               ),
                               child: Center(
                                 child: Text(
                                   cartItemCount > 99 ? '99+' : '$cartItemCount',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onPrimary,
                                     fontSize: 10.r,
                                     fontWeight: FontWeight.bold,
                                     height: 1,
@@ -232,7 +234,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               crossAxisCount: 2,
                               crossAxisSpacing: 12.r,
                               mainAxisSpacing: 12.r,
-                              childAspectRatio: 0.7,
+                              mainAxisExtent: 350.r,  // Fixed height with .r for responsiveness
                             ),
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
@@ -252,7 +254,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       SnackBar(
                                         content: Text('${product.name} added to cart'),
                                         duration: const Duration(seconds: 2),
-                                        backgroundColor: Colors.green,
+                                        backgroundColor: Theme.of(context).colorScheme.secondary,
                                       ),
                                     );
                                   },

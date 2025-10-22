@@ -46,11 +46,13 @@ class CustomSearchBar extends StatelessWidget {
         onTap: onTap,
         readOnly: onTap != null,
         decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(
-            color: Colors.grey[500],
-            fontSize: 14.r,
-          ),
+         filled: true,
+  fillColor: Colors.transparent,
+  hintText: hintText,
+  hintStyle: TextStyle(
+    color: Colors.grey[500],
+    fontSize: 14.r,
+  ),
           prefixIcon: Icon(
             Icons.search,
             color: Colors.grey[600],

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../constants/app_colors.dart';
 import '../providers/splash_provider.dart';
 import '../providers/auth_provider.dart';
 import 'login_screen.dart';
@@ -76,7 +77,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final brightness = Theme.of(context).brightness;
     return brightness == Brightness.dark
         ? Colors.white
-        : const Color(0xFF1F2937);
+        : AppColors.darkTextForLight;
   }
 
   /// Get accent color for fallback icon

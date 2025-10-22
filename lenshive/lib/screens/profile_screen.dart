@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../constants/app_colors.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 import 'login_screen.dart';
@@ -25,14 +26,7 @@ class ProfileScreen extends ConsumerWidget {
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 32.r, horizontal: 24.r),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF0A83BC),
-                      Color(0xFF4A90E2),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  gradient: AppColors.primaryGradient,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30.r),
                     bottomRight: Radius.circular(30.r),
@@ -59,7 +53,7 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      child: ClipOval(
+                      child:                       ClipOval(
                         child: Center(
                           child: Text(
                             user?.fullName != null && user!.fullName.isNotEmpty
@@ -68,7 +62,7 @@ class ProfileScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 40.r,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF0A83BC),
+                              color: AppColors.primary,
                             ),
                           ),
                         ),
@@ -264,11 +258,11 @@ class ProfileScreen extends ConsumerWidget {
       child: Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+          color: isDarkMode ? AppColors.cardDark : AppColors.cardLight,
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
+              color: isDarkMode ? AppColors.shadowDark : AppColors.shadowLight,
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -281,12 +275,12 @@ class ProfileScreen extends ConsumerWidget {
               width: 48.r,
               height: 48.r,
               decoration: BoxDecoration(
-                color: const Color(0xFF0A83BC).withOpacity(0.1),
+                color: AppColors.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFF0A83BC),
+                color: AppColors.primary,
                 size: 24.r,
               ),
             ),
@@ -340,11 +334,11 @@ class ProfileScreen extends ConsumerWidget {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+        color: isDarkMode ? AppColors.cardDark : AppColors.cardLight,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
+            color: isDarkMode ? AppColors.shadowDark : AppColors.shadowLight,
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -357,12 +351,12 @@ class ProfileScreen extends ConsumerWidget {
             width: 48.r,
             height: 48.r,
             decoration: BoxDecoration(
-              color: const Color(0xFF0A83BC).withOpacity(0.1),
+              color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
               isDarkMode ? Icons.dark_mode : Icons.light_mode,
-              color: const Color(0xFF0A83BC),
+              color: AppColors.primary,
               size: 24.r,
             ),
           ),
@@ -400,7 +394,7 @@ class ProfileScreen extends ConsumerWidget {
           Switch(
             value: isDarkMode,
             onChanged: onChanged,
-            activeColor: const Color(0xFF0A83BC),
+            activeColor: AppColors.primary,
           ),
         ],
       ),
@@ -466,7 +460,7 @@ class ProfileScreen extends ConsumerWidget {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+        backgroundColor: isDarkMode ? AppColors.cardDark : AppColors.cardLight,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.r),
         ),
@@ -514,7 +508,7 @@ class ProfileScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+        backgroundColor: isDarkMode ? AppColors.cardDark : AppColors.cardLight,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.r),
         ),
