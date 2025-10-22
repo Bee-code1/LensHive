@@ -2,19 +2,15 @@ from pathlib import Path
 from decouple import config
 import pymysql
 
-# Install PyMySQL as MySQLdb
 pymysql.install_as_MySQLdb()
 
-# Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security settings
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']  # dev
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -22,22 +18,26 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Third party apps
+
+    # 3rd-party
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    
-    # Local apps
+
+    # local
     'authentication.apps.AuthenticationConfig',
 ]
 
 MIDDLEWARE = [
+    # keep cors high and before Common/CSRF
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # Must be before CommonMiddleware
+
+    # correct order for sessions/CSRF/common
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -63,15 +63,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lenshive_backend.wsgi.application'
 
-# Database configuration
+# ---------- DATABASE ----------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': config('DB_NAME', default='lenshive_db'),
         'USER': config('DB_USER', default='root'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='3307'),
+        'PASSWORD': config('DB_PASSWORD', default='StrongPass!23'),  # <- update to your real pw or set in .env
+        'HOST': config('DB_HOST', default='127.0.0.1'),              # <- 127.0.0.1 (not localhost)
+        'PORT': config('DB_PORT', default='3306'),                   # <- 3306 (your MariaDB port)
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
@@ -84,59 +84,46 @@ AUTH_USER_MODEL = 'authentication.User'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 6,
-        }
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 6}},
 ]
 
-# Internationalization
+# i18n
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
-
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# REST Framework configuration
+# ---------- DRF ----------
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+        # If you intentionally use SessionAuthentication on some views,
+        # leave it in and CSRF will apply there.
+        # 'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
 }
 
-# CORS Settings - Allow Flutter app to connect
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# ---------- CORS / CSRF for Flutter web ----------
+# CORS: permissive for dev
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
+CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
 CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
+    'accept', 'accept-encoding', 'authorization', 'content-type', 'dnt',
+    'origin', 'user-agent', 'x-csrftoken', 'x-requested-with',
 ]
 
+# If any view uses SessionAuthentication/CSRF, trust your frontend origin(s).
+# Update ports as your Flutter dev server changes.
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:59863',
+    'http://127.0.0.1:59863',
+    # add more if your dev server uses other ports
+]
