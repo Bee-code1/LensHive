@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'constants/app_theme.dart';
 import 'providers/theme_provider.dart';
-import 'screens/splash_screen.dart';
+import 'config/router_config.dart';
 
 void main() async {
   // Ensure Flutter binding is initialized
@@ -31,7 +31,7 @@ class MyApp extends ConsumerWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           title: 'LensHive',
           debugShowCheckedModeBanner: false,
       
@@ -44,8 +44,8 @@ class MyApp extends ConsumerWidget {
           // Use theme mode from provider
           themeMode: themeMode,
       
-          // Start with splash screen
-          home: const SplashScreen()
+          // Router configuration
+          routerConfig: appRouter,
         );
       },
     );

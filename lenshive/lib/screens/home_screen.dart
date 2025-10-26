@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/home_provider.dart';
 import '../widgets/custom_search_bar.dart';
 import '../widgets/category_tabs.dart';
 import '../widgets/enhanced_product_card.dart';
 import '../widgets/skeleton_loaders.dart';
 import '../widgets/bottom_nav_bar.dart';
+import '../constants/app_colors.dart';
 import 'profile_screen.dart';
 
 /// Home Screen - Main screen with product catalog
@@ -163,6 +165,85 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           // Handle image upload for AI search
                         },
                       ),
+              ),
+
+              // Quiz Banner - Find Your Perfect Lens
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 12.r),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => context.push('/quiz/step1'),
+                      borderRadius: BorderRadius.circular(16.r),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? AppColors.primaryDarkMode
+                                  : AppColors.primary,
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? AppColors.primaryDarkMode.withOpacity(0.8)
+                                  : AppColors.primaryLight,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all(18.r),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(12.r),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                child: Icon(
+                                  Icons.quiz_rounded,
+                                  color: AppColors.white,
+                                  size: 28.r,
+                                ),
+                              ),
+                              SizedBox(width: 16.r),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Find Your Perfect Lens',
+                                      style: TextStyle(
+                                        fontSize: 17.r,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.white,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4.r),
+                                    Text(
+                                      '3 quick questions • Personalized results',
+                                      style: TextStyle(
+                                        fontSize: 13.r,
+                                        color: AppColors.white.withOpacity(0.9),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                color: AppColors.white,
+                                size: 18.r,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
 
               // Category Tabs

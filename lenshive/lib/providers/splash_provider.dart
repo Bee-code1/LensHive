@@ -15,7 +15,7 @@ class SplashNotifier extends StateNotifier<SplashState> {
   /// Initialize splash screen with delay
   Future<void> _initializeSplash() async {
     // Wait for 3 seconds to show splash screen
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 6));
     
     // Navigate to login screen after delay
     if (mounted) {
