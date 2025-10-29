@@ -5,7 +5,7 @@ import uuid
 class UserManager(BaseUserManager):
     """Custom user manager for email-based authentication"""
     
-    def create_user(self, email, full_name, password=None):
+    def create_user(self, email, full_name, password=None, **extra_fields):
         """Create and save a regular user"""
         if not email:
             raise ValueError('Users must have an email address')
@@ -15,6 +15,7 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             full_name=full_name,
+            **extra_fields
         )
         user.set_password(password)
         user.save(using=self._db)

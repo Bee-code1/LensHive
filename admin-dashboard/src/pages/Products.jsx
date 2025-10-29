@@ -22,6 +22,7 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
+  StarBorder as StarBorderIcon,
 } from '@mui/icons-material';
 
 export default function Products() {
@@ -34,7 +35,8 @@ export default function Products() {
     description: '',
     price: '',
     stock: '',
-    image: null,
+    images: [],
+    existingImages: [],
   });
 
   useEffect(() => {
@@ -46,11 +48,18 @@ export default function Products() {
       const response = await fetch('http://localhost:8000/api/products/', {
         headers: {
           'Authorization': `Token ${localStorage.getItem('token')}`,
-        }
+        },
+        // Add cache busting to ensure we get fresh data
+        cache: 'no-store'
       });
       if (response.ok) {
         const data = await response.json();
-        setProducts(data);
+        // Ensure the data is properly formatted
+        setProducts(data.map(product => ({
+          ...product,
+          primary_image: product.primary_image ? product.primary_image : null,
+          images: product.images || []
+        })));
       } else {
         showNotification('Failed to fetch products', 'error');
       }
@@ -60,16 +69,36 @@ export default function Products() {
     }
   };
 
-  const handleOpen = (product = null) => {
+  const handleOpen = async (product = null) => {
     if (product) {
-      setEditProduct(product);
-      setFormData({
-        name: product.name,
-        description: product.description,
-        price: product.price.toString(),
-        stock: product.stock.toString(),
-        image: null,
-      });
+      try {
+        // Get the full product data to ensure we have all image information
+        const response = await fetch(`http://localhost:8000/api/products/${product.id}/`, {
+          headers: {
+            'Authorization': `Token ${localStorage.getItem('token')}`,
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch product details');
+        }
+
+        const fullProduct = await response.json();
+        console.log('Fetched product details:', fullProduct); // Debug log
+
+        setEditProduct(fullProduct);
+        setFormData({
+          name: fullProduct.name,
+          description: fullProduct.description,
+          price: fullProduct.price.toString(),
+          stock: fullProduct.stock.toString(),
+          images: [],
+          existingImages: fullProduct.images || [],
+        });
+      } catch (error) {
+        console.error('Error fetching product details:', error);
+        showNotification('Error loading product details', 'error');
+      }
     } else {
       setEditProduct(null);
       setFormData({
@@ -77,7 +106,8 @@ export default function Products() {
         description: '',
         price: '',
         stock: '',
-        image: null,
+        images: [],
+        existingImages: [],
       });
     }
     setOpen(true);
@@ -86,13 +116,25 @@ export default function Products() {
   const handleClose = () => {
     setOpen(false);
     setEditProduct(null);
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      stock: '',
+      images: [],
+      existingImages: [],
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataToSend = new FormData();
     Object.keys(formData).forEach(key => {
-      if (formData[key] !== null) {
+      if (key === 'images') {
+        formData[key].forEach(file => {
+          formDataToSend.append('images', file);
+        });
+      } else if (key !== 'existingImages' && formData[key] !== null) {
         formDataToSend.append(key, formData[key]);
       }
     });
@@ -111,11 +153,23 @@ export default function Products() {
       });
 
       if (response.ok) {
-        fetchProducts();
+        const result = await response.json();
+        // Update products list with the new data
+        if (editProduct) {
+          setProducts(products.map(p => p.id === editProduct.id ? result : p));
+        } else {
+          setProducts([result, ...products]);
+        }
         handleClose();
+        // Show success notification
+        showNotification(editProduct ? 'Product updated successfully' : 'Product created successfully');
+      } else {
+        const errorData = await response.json();
+        showNotification(errorData.detail || 'Failed to save product', 'error');
       }
     } catch (error) {
       console.error('Error saving product:', error);
+      showNotification('Error saving product', 'error');
     }
   };
 
@@ -157,22 +211,29 @@ export default function Products() {
 
   const columns = [
     {
-      field: 'image',
+      field: 'primary_image',
       headerName: 'Image',
       width: 100,
-      renderCell: (params) => (
-        <Box
-          component="img"
-          sx={{
-            height: 50,
-            width: 50,
-            objectFit: 'cover',
-            borderRadius: 1,
-          }}
-          src={params.row.image || '/placeholder.png'}
-          alt={params.row.name}
-        />
-      ),
+      renderCell: (params) => {
+        const imageUrl = params.row.primary_image 
+          ? (params.row.primary_image.startsWith('http') 
+             ? params.row.primary_image 
+             : `http://localhost:8000${params.row.primary_image}`)
+          : '/placeholder.png';
+        return (
+          <Box
+            component="img"
+            sx={{
+              height: 50,
+              width: 50,
+              objectFit: 'cover',
+              borderRadius: 1,
+            }}
+            src={imageUrl}
+            alt={params.row.name}
+          />
+        );
+      },
     },
     {
       field: 'name',
@@ -297,12 +358,163 @@ export default function Products() {
               onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
               required
             />
-            <TextField
-              fullWidth
-              type="file"
-              margin="normal"
-              onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
-            />
+            <Box sx={{ mt: 2, mb: 2 }}>
+              <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="raised-button-file"
+                multiple
+                type="file"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files);
+                  setFormData({ ...formData, images: [...formData.images, ...files] });
+                }}
+              />
+              <label htmlFor="raised-button-file">
+                <Button variant="outlined" component="span">
+                  Upload Images
+                </Button>
+              </label>
+            </Box>
+            
+            {/* Image Previews */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+              {/* Existing Images */}
+              {formData.existingImages.map((img, index) => (
+                <Box
+                  key={`existing-${index}`}
+                  sx={{
+                    position: 'relative',
+                    width: 100,
+                    height: 100,
+                  }}
+                >
+                  <Box
+                    component="img"
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: 1,
+                    }}
+                    src={`http://localhost:8000${img.image_url}`}
+                    alt={`Existing ${index}`}
+                  />
+                  <IconButton
+                    size="small"
+                    sx={{
+                      position: 'absolute',
+                      top: -8,
+                      right: -8,
+                      bgcolor: 'background.paper',
+                      '&:hover': { bgcolor: 'error.light' },
+                    }}
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(
+                          `http://localhost:8000/api/products/${editProduct.id}/delete_image/`,
+                          {
+                            method: 'POST',
+                            headers: {
+                              'Authorization': `Token ${localStorage.getItem('token')}`,
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ image_id: img.id }),
+                          }
+                        );
+                        if (response.ok) {
+                          setFormData({
+                            ...formData,
+                            existingImages: formData.existingImages.filter((_, i) => i !== index),
+                          });
+                        }
+                      } catch (error) {
+                        console.error('Error deleting image:', error);
+                      }
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                  {!img.is_primary && (
+                    <IconButton
+                      size="small"
+                      sx={{
+                        position: 'absolute',
+                        top: -8,
+                        left: -8,
+                        bgcolor: 'background.paper',
+                        '&:hover': { bgcolor: 'primary.light' },
+                      }}
+                      onClick={async () => {
+                        try {
+                          const response = await fetch(
+                            `http://localhost:8000/api/products/${editProduct.id}/set_primary_image/`,
+                            {
+                              method: 'POST',
+                              headers: {
+                                'Authorization': `Token ${localStorage.getItem('token')}`,
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({ image_id: img.id }),
+                            }
+                          );
+                          if (response.ok) {
+                            // Refresh the product data
+                            fetchProducts();
+                          }
+                        } catch (error) {
+                          console.error('Error setting primary image:', error);
+                        }
+                      }}
+                    >
+                      <StarBorderIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </Box>
+              ))}
+
+              {/* New Images */}
+              {formData.images.map((file, index) => (
+                <Box
+                  key={`new-${index}`}
+                  sx={{
+                    position: 'relative',
+                    width: 100,
+                    height: 100,
+                  }}
+                >
+                  <Box
+                    component="img"
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: 1,
+                    }}
+                    src={URL.createObjectURL(file)}
+                    alt={`New ${index}`}
+                  />
+                  <IconButton
+                    size="small"
+                    sx={{
+                      position: 'absolute',
+                      top: -8,
+                      right: -8,
+                      bgcolor: 'background.paper',
+                      '&:hover': { bgcolor: 'error.light' },
+                    }}
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        images: formData.images.filter((_, i) => i !== index),
+                      });
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              ))}
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

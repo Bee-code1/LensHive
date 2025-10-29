@@ -13,11 +13,6 @@ class Product(models.Model):
         default=0,
         validators=[MinValueValidator(0)]
     )
-    image = models.ImageField(
-        upload_to='products/',
-        null=True,
-        blank=True
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -26,3 +21,21 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='products/')
+    is_primary = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-is_primary', '-created_at']
+
+    def save(self, *args, **kwargs):
+        if self.is_primary:
+            # Set all other images of this product to not primary
+            ProductImage.objects.filter(product=self.product).update(is_primary=False)
+        elif not ProductImage.objects.filter(product=self.product).exists():
+            # If this is the first image, make it primary
+            self.is_primary = True
+        super().save(*args, **kwargs)

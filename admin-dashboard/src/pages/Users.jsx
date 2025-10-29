@@ -33,6 +33,7 @@ export default function Users() {
     email: '',
     password: '',
     role: 'staff',
+    is_active: true,
   });
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -56,9 +57,22 @@ export default function Users() {
       });
       if (response.ok) {
         const data = await response.json();
-        setUsers(data);
+        // Format data to ensure consistent structure
+        const formattedUsers = data.map(user => ({
+          ...user,
+          id: user.id,
+          full_name: user.full_name,
+          email: user.email,
+          role: user.role,
+          is_active: user.is_active,
+        }));
+        setUsers(formattedUsers);
+      } else {
+        const error = await response.json();
+        showNotification(error.message || 'Failed to fetch users', 'error');
       }
     } catch (error) {
+      console.error('Error fetching users:', error);
       showNotification('Error fetching users', 'error');
     }
   };
@@ -70,6 +84,7 @@ export default function Users() {
         full_name: user.full_name,
         email: user.email,
         role: user.role,
+        is_active: user.is_active,
         password: '', // Don't populate password for edit
       });
     } else {
@@ -79,6 +94,7 @@ export default function Users() {
         email: '',
         password: '',
         role: 'staff',
+        is_active: true,
       });
     }
     setOpen(true);
@@ -101,9 +117,31 @@ export default function Users() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
+      // Ensure we're using the string representation of the UUID
       const url = editUser
-        ? `http://localhost:8000/api/auth/users/${editUser.id}/`
-        : 'http://localhost:8000/api/auth/users/';
+        ? `http://localhost:8000/api/auth/users/${editUser.id.toString()}/`
+        : 'http://localhost:8000/api/auth/users/create/';
+
+      // Prepare data to send
+      const dataToSend = {
+        full_name: formData.full_name,
+        email: formData.email.toLowerCase(),
+        role: formData.role,
+        is_active: formData.is_active
+      };
+      
+      // Only include password if it's provided (for edit) or if creating new user
+      if (formData.password) {
+        dataToSend.password = formData.password;
+      }
+
+      if (!dataToSend.password && !editUser) {
+        showNotification('Password is required for new users', 'error');
+        return;
+      }
+
+      console.log('Making request to:', url);
+      console.log('With data:', dataToSend);
 
       const response = await fetch(url, {
         method: editUser ? 'PUT' : 'POST',
@@ -111,20 +149,38 @@ export default function Users() {
           'Content-Type': 'application/json',
           'Authorization': `Token ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
       });
+
+      console.log('Response status:', response.status);
+
+      const data = await response.json();
 
       if (response.ok) {
         showNotification(
-          editUser ? 'User updated successfully' : 'User created successfully'
+          editUser ? 'User updated successfully' : 'User created successfully',
+          'success'
         );
         fetchUsers();
         handleClose();
       } else {
-        const error = await response.json();
-        showNotification(error.message || 'Operation failed', 'error');
+        // Handle specific error messages
+        let errorMessage = 'Operation failed';
+        if (typeof data === 'object') {
+          // Try to find the first error message
+          const firstError = Object.entries(data).find(([key, value]) => 
+            Array.isArray(value) ? value[0] : value
+          );
+          if (firstError) {
+            errorMessage = Array.isArray(firstError[1]) 
+              ? firstError[1][0] 
+              : firstError[1];
+          }
+        }
+        showNotification(errorMessage, 'error');
       }
     } catch (error) {
+      console.error('Error:', error);
       showNotification('Operation failed', 'error');
     }
   };
@@ -145,9 +201,14 @@ export default function Users() {
         showNotification('User deleted successfully');
         fetchUsers();
       } else {
-        showNotification('Failed to delete user', 'error');
+        const error = await response.json();
+        showNotification(
+          error.message || 'Failed to delete user',
+          'error'
+        );
       }
     } catch (error) {
+      console.error('Error deleting user:', error);
       showNotification('Failed to delete user', 'error');
     }
   };
@@ -170,12 +231,38 @@ export default function Users() {
       headerName: 'Role',
       width: 120,
       renderCell: (params) => (
-        <Typography sx={{ 
-          textTransform: 'capitalize',
-          color: params.value === 'admin' ? 'primary.main' : 'text.primary',
-        }}>
+        <Box
+          sx={{
+            backgroundColor: params.value === 'admin' ? 'primary.main' : 'grey.200',
+            color: params.value === 'admin' ? 'white' : 'text.primary',
+            px: 1,
+            py: 0.5,
+            borderRadius: 1,
+            fontSize: '0.875rem',
+            textTransform: 'capitalize',
+          }}
+        >
           {params.value}
-        </Typography>
+        </Box>
+      ),
+    },
+    {
+      field: 'is_active',
+      headerName: 'Status',
+      width: 120,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            backgroundColor: params.value ? 'success.light' : 'error.light',
+            color: params.value ? 'success.dark' : 'error.dark',
+            px: 1,
+            py: 0.5,
+            borderRadius: 1,
+            fontSize: '0.875rem',
+          }}
+        >
+          {params.value ? 'Active' : 'Inactive'}
+        </Box>
       ),
     },
     {
@@ -286,6 +373,17 @@ export default function Users() {
               >
                 <MenuItem value="staff">Staff</MenuItem>
                 <MenuItem value="admin">Admin</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={formData.is_active}
+                label="Status"
+                onChange={(e) => setFormData({ ...formData, is_active: e.target.value })}
+              >
+                <MenuItem value={true}>Active</MenuItem>
+                <MenuItem value={false}>Inactive</MenuItem>
               </Select>
             </FormControl>
           </DialogContent>
