@@ -13,6 +13,7 @@ class Product {
   final int? stock;
   final List<String>? colors;
   final List<String>? sizes;
+  final List<String>? lensOptions; // Lens options (Frame only, Customize Lenses)
   final double? rating; // Product rating (0-5)
   final int? reviewCount; // Number of reviews
   final bool isBestseller; // Bestseller badge
@@ -31,6 +32,7 @@ class Product {
     this.stock,
     this.colors,
     this.sizes,
+    this.lensOptions,
     this.rating,
     this.reviewCount,
     this.isBestseller = false,
@@ -44,7 +46,7 @@ class Product {
       name: json['name'] ?? '',
       price: (json['price'] ?? 0).toDouble(),
       currency: json['currency'] ?? 'PKR',
-      imageUrl: json['image_url'] ?? json['imageUrl'] ?? '',
+      imageUrl: json['image_url'] ?? json['imageUrl'] ?? json['primary_image'] ?? '',
       category: json['category'],
       brand: json['brand'],
       description: json['description'],
@@ -55,6 +57,9 @@ class Product {
           : null,
       sizes: json['sizes'] != null 
           ? List<String>.from(json['sizes']) 
+          : null,
+      lensOptions: json['lens_options'] != null 
+          ? List<String>.from(json['lens_options']) 
           : null,
       rating: json['rating']?.toDouble(),
       reviewCount: json['review_count'] ?? json['reviewCount'],
@@ -78,6 +83,7 @@ class Product {
       'stock': stock,
       'colors': colors,
       'sizes': sizes,
+      'lens_options': lensOptions,
       'rating': rating,
       'review_count': reviewCount,
       'is_bestseller': isBestseller,
@@ -99,6 +105,7 @@ class Product {
     int? stock,
     List<String>? colors,
     List<String>? sizes,
+    List<String>? lensOptions,
     double? rating,
     int? reviewCount,
     bool? isBestseller,
@@ -117,6 +124,7 @@ class Product {
       stock: stock ?? this.stock,
       colors: colors ?? this.colors,
       sizes: sizes ?? this.sizes,
+      lensOptions: lensOptions ?? this.lensOptions,
       rating: rating ?? this.rating,
       reviewCount: reviewCount ?? this.reviewCount,
       isBestseller: isBestseller ?? this.isBestseller,

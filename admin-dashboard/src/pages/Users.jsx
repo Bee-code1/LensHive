@@ -32,7 +32,7 @@ export default function Users() {
     full_name: '',
     email: '',
     password: '',
-    role: 'staff',
+    role: 'customer',
     is_active: true,
   });
   const [snackbar, setSnackbar] = useState({
@@ -93,7 +93,7 @@ export default function Users() {
         full_name: '',
         email: '',
         password: '',
-        role: 'staff',
+        role: 'customer',
         is_active: true,
       });
     }
@@ -371,6 +371,7 @@ export default function Users() {
                 label="Role"
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               >
+                <MenuItem value="customer">Customer</MenuItem>
                 <MenuItem value="staff">Staff</MenuItem>
                 <MenuItem value="admin">Admin</MenuItem>
               </Select>

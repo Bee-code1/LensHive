@@ -125,18 +125,12 @@ class AdminUserSerializer(serializers.ModelSerializer):
         if not password:
             raise serializers.ValidationError({'password': 'Password is required'})
             
-        # Set is_staff based on role
-        is_staff = validated_data.get('role') in ['admin', 'staff']
-        is_admin = validated_data.get('role') == 'admin'
-            
         user = User.objects.create_user(
             email=validated_data['email'].lower(),
             full_name=validated_data['full_name'],
             password=password,
-            is_active=validated_data.get('is_active', True),
-            is_staff=is_staff,
-            is_admin=is_admin,
-            **validated_data
+            role=validated_data.get('role', 'customer'),
+            is_active=validated_data.get('is_active', True)
         )
         return user
         
@@ -144,11 +138,6 @@ class AdminUserSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password', None)
         if password:
             instance.set_password(password)
-            
-        if 'role' in validated_data:
-            # Update is_staff and is_admin based on role
-            instance.is_staff = validated_data['role'] in ['admin', 'staff']
-            instance.is_admin = validated_data['role'] == 'admin'
             
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

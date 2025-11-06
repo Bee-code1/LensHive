@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We need camera access to capture your prescription for custom lenses</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need photo library access to upload your prescription image</string>
 </dict>
 </plist>

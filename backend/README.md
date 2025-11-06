@@ -103,13 +103,12 @@ python manage.py migrate
 
 You should see multiple lines ending with `OK`.
 
-### Step 3.3: Create Admin Superuser (OPTIONAL - Currently Disabled)
+### Step 3.3: Create Admin User
 
-**Note:** Admin panel is currently disabled. Skip this step for now.
+Create your first admin user to access the admin dashboard:
 
-<!-- 
 ```bash
-python manage.py createsuperuser
+python manage.py createadmin
 ```
 
 Enter the following when prompted:
@@ -117,7 +116,8 @@ Enter the following when prompted:
 - **Full name**: `Admin User`
 - **Password**: Your choice (e.g., `admin123`)
 - **Password (again)**: Same password
--->
+
+✅ **Admin user created!** You can now login to the admin dashboard.
 
 ---
 
@@ -151,17 +151,31 @@ Expected response:
 }
 ```
 
-### Test 2: Admin Panel (Currently Disabled)
+### Test 2: Admin Dashboard
 
-**Note:** Admin panel has been disabled for now. You can skip this test.
+**Start the Admin Dashboard:**
 
-<!-- 
-Visit: `http://localhost:8000/admin`
+Open a new terminal and run:
+
+```bash
+cd E:\FYP_developement\LENSHIVE\admin-dashboard
+npm install  # First time only
+npm run dev
+```
+
+Visit: `http://localhost:5173`
 
 Login with:
 - **Email**: `admin@lenshive.com`
-- **Password**: Your superuser password
--->
+- **Password**: Your admin password
+
+**What you can do:**
+- View analytics dashboard
+- Manage users (admin only)
+- Manage products
+- View statistics and charts
+
+📚 **For complete dashboard documentation**, see: `backend/ADMIN_SETUP_GUIDE.md`
 
 ### Test 3: Using Postman/Thunder Client
 
@@ -275,13 +289,37 @@ Map<String, dynamic> toJson() {
 
 ## 📚 API Endpoints Reference
 
+### Public Endpoints
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | GET | `/api/auth/test` | Test connection | No |
 | POST | `/api/auth/register` | Register new user | No |
 | POST | `/api/auth/login` | Login user | No |
-| POST | `/api/auth/logout` | Logout user | Yes |
-| GET | `/api/user/profile` | Get user profile | Yes |
+
+### Protected Endpoints
+| Method | Endpoint | Description | Role Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/auth/logout` | Logout user | Any |
+| GET | `/api/user/profile` | Get user profile | Any |
+| GET | `/api/auth/verify` | Verify token | Any |
+
+### Admin Only Endpoints
+| Method | Endpoint | Description | Role Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/auth/users/` | List all users | Admin |
+| POST | `/api/auth/users/create/` | Create new user | Admin |
+| GET | `/api/auth/users/{id}/` | Get user details | Admin |
+| PUT | `/api/auth/users/{id}/` | Update user | Admin |
+| DELETE | `/api/auth/users/{id}/` | Delete user | Admin |
+
+### Product Endpoints
+| Method | Endpoint | Description | Role Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/products/` | List all products | Any |
+| POST | `/api/products/` | Create product | Staff/Admin |
+| GET | `/api/products/{id}/` | Get product details | Any |
+| PUT | `/api/products/{id}/` | Update product | Staff/Admin |
+| DELETE | `/api/products/{id}/` | Delete product | Staff/Admin |
 
 ---
 
@@ -328,6 +366,10 @@ backend/
 ├── .env                        # Environment variables (DO NOT COMMIT)
 ├── .gitignore                  # Git ignore rules
 ├── README.md                   # This file
+├── ADMIN_SETUP_GUIDE.md        # Complete admin guide
+├── QUICK_REFERENCE.md          # Quick command reference
+├── CHANGES_SUMMARY.md          # Technical changes log
+├── WHAT_CHANGED.md             # Quick summary of changes
 │
 ├── lenshive_backend/           # Main project folder
 │   ├── __init__.py
@@ -336,16 +378,29 @@ backend/
 │   ├── wsgi.py                 # WSGI config
 │   └── asgi.py                 # ASGI config
 │
-└── authentication/             # Authentication app
-    ├── __init__.py
-    ├── models.py               # User model
-    ├── serializers.py          # API serializers
-    ├── views.py                # API views/endpoints
-    ├── urls.py                 # App URL routes
-    ├── admin.py                # Admin panel config
-    ├── apps.py                 # App configuration
-    └── migrations/             # Database migrations
-        └── __init__.py
+├── authentication/             # Authentication app
+│   ├── __init__.py
+│   ├── models.py               # User model (simplified)
+│   ├── serializers.py          # API serializers
+│   ├── views.py                # API views/endpoints
+│   ├── admin_views.py          # Admin-only views
+│   ├── urls.py                 # App URL routes
+│   ├── permissions.py          # Custom permissions
+│   ├── apps.py                 # App configuration
+│   ├── management/             # Custom commands
+│   │   └── commands/
+│   │       ├── createadmin.py  # Create admin user
+│   │       └── set_admin_role.py # Set user role to admin
+│   └── migrations/             # Database migrations
+│       ├── 0001_initial.py
+│       ├── 0002_user_role.py
+│       └── 0003_simplify_user_model.py
+│
+└── products/                   # Products app
+    ├── models.py               # Product & ProductImage models
+    ├── serializers.py          # Product serializers
+    ├── views.py                # Product API views
+    └── urls.py                 # Product URL routes
 ```
 
 ---
@@ -364,11 +419,43 @@ backend/
 
 ---
 
+## 👥 User Roles System
+
+LensHive uses a simple role-based system:
+
+| Role | Default | Description | Permissions |
+|------|---------|-------------|-------------|
+| **customer** | ✅ Yes | Regular app users | Use mobile app, take quizzes, browse products |
+| **staff** | No | Team members | Manage products, view analytics, use dashboard |
+| **admin** | No | Administrators | All permissions + manage users |
+
+**Create Admin:**
+```bash
+python manage.py createadmin
+```
+
+**Promote User to Admin:**
+```bash
+python manage.py set_admin_role user@example.com
+```
+
+📚 **For complete details**, see: `backend/ADMIN_SETUP_GUIDE.md`
+
+---
+
 ## 🎓 Additional Resources
 
+**Project Documentation:**
+- `backend/ADMIN_SETUP_GUIDE.md` - Complete admin guide & dashboard features
+- `backend/QUICK_REFERENCE.md` - Quick command reference
+- `backend/CHANGES_SUMMARY.md` - Technical implementation details
+- `backend/WHAT_CHANGED.md` - What changed and why
+
+**External Resources:**
 - [Django Documentation](https://docs.djangoproject.com/)
 - [Django REST Framework](https://www.django-rest-framework.org/)
 - [MySQL Documentation](https://dev.mysql.com/doc/)
+- [Material-UI (Admin Dashboard)](https://mui.com/)
 
 ---
 

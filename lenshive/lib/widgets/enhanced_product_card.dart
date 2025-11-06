@@ -40,7 +40,7 @@ class EnhancedProductCard extends StatelessWidget {
           children: [
             // Product Image with badges and Try On button
             SizedBox(
-              height: 220.r,  // Fixed height for consistent image size
+              height: 160.r,  // Reduced height for more compact cards
               child: Stack(
                 children: [
                   // Image Container
@@ -218,7 +218,7 @@ class EnhancedProductCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15.r,
                           fontWeight: FontWeight.w700,
-                          color: Theme.of(context).colorScheme.secondary,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                         ),
                       ),                      // Add to Cart Button
                       GestureDetector(

@@ -30,7 +30,7 @@ class CustomSearchBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(25.r),
         border: Border.all(
           color: Theme.of(context).dividerColor.withOpacity(0.1),
-          width: 1,
+          width: 2,
         ),
         boxShadow: [
           BoxShadow(
@@ -41,18 +41,20 @@ class CustomSearchBar extends StatelessWidget {
         ],
       ),
       child: TextField(
+        
         controller: controller,
         onChanged: onChanged,
         onTap: onTap,
         readOnly: onTap != null,
         decoration: InputDecoration(
+          
          filled: true,
-  fillColor: Colors.transparent,
-  hintText: hintText,
-  hintStyle: TextStyle(
-    color: Colors.grey[500],
-    fontSize: 14.r,
-  ),
+          fillColor: Colors.transparent,
+          hintText: hintText,
+            hintStyle: TextStyle(
+           color: Colors.grey[500],
+             fontSize: 14.r,
+          ),
           prefixIcon: Icon(
             Icons.search,
             color: Colors.grey[600],

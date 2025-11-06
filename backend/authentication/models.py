@@ -1,16 +1,19 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import uuid
 
 class UserManager(BaseUserManager):
     """Custom user manager for email-based authentication"""
     
-    def create_user(self, email, full_name, password=None, **extra_fields):
+    def create_user(self, email, full_name, password=None, role='customer', **extra_fields):
         """Create and save a regular user"""
         if not email:
             raise ValueError('Users must have an email address')
         if not full_name:
             raise ValueError('Users must have a full name')
+        
+        # Set role in extra_fields
+        extra_fields.setdefault('role', role)
         
         user = self.model(
             email=self.normalize_email(email),
@@ -21,35 +24,30 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
-    def create_superuser(self, email, full_name, password=None):
-        """Create and save a superuser"""
+    def create_admin(self, email, full_name, password=None):
+        """Create and save an admin user"""
         user = self.create_user(
             email=email,
             full_name=full_name,
             password=password,
+            role='admin'
         )
-        user.is_admin = True
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
         return user
 
-class User(AbstractBaseUser, PermissionsMixin):
-    """Custom User model with email as username"""
+class User(AbstractBaseUser):
+    """Custom User model with email as username and role-based access"""
     
     ROLE_CHOICES = [
-        ('admin', 'Admin'),
+        ('customer', 'Customer'),
         ('staff', 'Staff'),
+        ('admin', 'Admin'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     full_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True, max_length=255, db_index=True)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='staff')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -61,11 +59,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
     
-    def has_perm(self, perm, obj=None):
-        return self.is_admin
+    @property
+    def is_staff_member(self):
+        """Check if user is staff or admin"""
+        return self.role in ['staff', 'admin']
     
-    def has_module_perms(self, app_label):
-        return self.is_admin
+    @property
+    def is_admin_user(self):
+        """Check if user is admin"""
+        return self.role == 'admin'
     
     class Meta:
         db_table = 'users'

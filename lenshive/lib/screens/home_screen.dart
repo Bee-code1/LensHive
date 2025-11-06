@@ -315,7 +315,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               crossAxisCount: 2,
                               crossAxisSpacing: 12.r,
                               mainAxisSpacing: 12.r,
-                              mainAxisExtent: 350.r,  // Fixed height with .r for responsiveness
+                              mainAxisExtent: 280.r,  // Reduced height for more compact cards
                             ),
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
@@ -325,9 +325,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   product: product,
                                   onTap: () {
                                     // Navigate to product detail screen
+                                    context.push(
+                                      '/product/${product.id}',
+                                      extra: product,
+                                    );
                                   },
                                   onTryOn: () {
                                     // Navigate to AR try-on screen
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('AR Try-On feature coming soon!'),
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
                                   },
                                   onAddToCart: () {
                                     // Add to cart action

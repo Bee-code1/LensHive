@@ -5,11 +5,13 @@ import '../screens/login_screen.dart';
 import '../screens/registration_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/product_detail_screen.dart';
 import '../features/quiz/steps/quiz_step1_basics.dart';
 import '../features/quiz/steps/quiz_step2_usage.dart';
 import '../features/quiz/steps/quiz_step3_preferences.dart';
 import '../features/quiz/result/new_recommendation_screen.dart';
 import '../features/quiz/models/questionnaire_models.dart';
+import '../models/product_model.dart';
 
 /// GoRouter configuration for app navigation
 final GoRouter appRouter = GoRouter(
@@ -47,6 +49,16 @@ final GoRouter appRouter = GoRouter(
       path: '/profile',
       name: 'profile',
       builder: (context, state) => const ProfileScreen(),
+    ),
+    
+    // Product Detail Screen
+    GoRoute(
+      path: '/product/:id',
+      name: 'product_detail',
+      builder: (context, state) {
+        final product = state.extra as Product;
+        return ProductDetailScreen(product: product);
+      },
     ),
     
     // Quiz Routes - Simplified 3-step process
