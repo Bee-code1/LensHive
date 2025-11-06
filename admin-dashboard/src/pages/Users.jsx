@@ -303,19 +303,27 @@ export default function Users() {
   }
 
   return (
-    <Box>
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Users</Typography>
+    <Box sx={{ width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, color: '#212121' }}>
+          Users
+        </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => handleOpen()}
+          sx={{
+            backgroundColor: '#0A83BC',
+            '&:hover': {
+              backgroundColor: '#075A85',
+            },
+          }}
         >
           Add User
         </Button>
       </Box>
 
-      <Box sx={{ height: 600, width: '100%' }}>
+      <Box sx={{ height: 600, width: '100%', maxWidth: '100%', overflowX: 'auto' }}>
         <DataGrid
           rows={users}
           columns={columns}
@@ -328,6 +336,12 @@ export default function Users() {
             toolbar: {
               showQuickFilter: true,
               quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          sx={{
+            width: '100%',
+            '& .MuiDataGrid-root': {
+              border: 'none',
             },
           }}
         />

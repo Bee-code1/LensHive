@@ -37,6 +37,8 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       duration: theme.transitions.duration.leavingScreen,
     }),
     marginLeft: `-${drawerWidth}px`,
+    width: '100%',
+    overflowX: 'hidden',
     ...(open && {
       transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.easeOut,
@@ -65,7 +67,14 @@ export default function Layout() {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar 
+        position="fixed" 
+        sx={{ 
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backgroundColor: '#0A83BC',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        }}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -76,7 +85,25 @@ export default function Layout() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Box
+            component="img"
+            src="/lenshive_logo.png"
+            alt="LensHive Logo"
+            sx={{
+              height: 40,
+              width: 'auto',
+              mr: 2,
+            }}
+          />
+          <Typography 
+            variant="h6" 
+            noWrap 
+            component="div" 
+            sx={{ 
+              flexGrow: 1,
+              fontWeight: 600,
+            }}
+          >
             LensHive Admin
           </Typography>
           <IconButton
@@ -84,6 +111,11 @@ export default function Layout() {
             onClick={() => logout()}
             aria-label="logout"
             title="Logout"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
+            }}
           >
             <LogoutIcon />
           </IconButton>
@@ -97,6 +129,8 @@ export default function Layout() {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
+            backgroundColor: '#FFFFFF',
+            borderRight: '1px solid #E0E0E0',
           },
         }}
         variant="persistent"
@@ -104,44 +138,134 @@ export default function Layout() {
         open={open}
       >
         <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
+          <IconButton 
+            onClick={handleDrawerClose}
+            sx={{
+              '&:hover': {
+                backgroundColor: '#F5F5F5',
+              },
+            }}
+          >
             <ChevronLeftIcon />
           </IconButton>
         </DrawerHeader>
-        <Divider />
-        <List>
+        <Divider sx={{ borderColor: '#E0E0E0' }} />
+        <List sx={{ pt: 1 }}>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => navigate('/')}>
+            <ListItemButton 
+              onClick={() => navigate('/')}
+              sx={{
+                borderRadius: '8px',
+                mx: 1,
+                mb: 0.5,
+                '&:hover': {
+                  backgroundColor: '#F5F5F5',
+                },
+                '&.Mui-selected': {
+                  backgroundColor: '#E3F2FD',
+                  color: '#0A83BC',
+                  '&:hover': {
+                    backgroundColor: '#E3F2FD',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: '#0A83BC',
+                  },
+                },
+              }}
+            >
               <ListItemIcon>
                 <DashboardIcon />
               </ListItemIcon>
-              <ListItemText primary="Dashboard" />
+              <ListItemText 
+                primary="Dashboard"
+                primaryTypographyProps={{
+                  fontWeight: 500,
+                }}
+              />
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => navigate('/products')}>
+            <ListItemButton 
+              onClick={() => navigate('/products')}
+              sx={{
+                borderRadius: '8px',
+                mx: 1,
+                mb: 0.5,
+                '&:hover': {
+                  backgroundColor: '#F5F5F5',
+                },
+                '&.Mui-selected': {
+                  backgroundColor: '#E3F2FD',
+                  color: '#0A83BC',
+                  '&:hover': {
+                    backgroundColor: '#E3F2FD',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: '#0A83BC',
+                  },
+                },
+              }}
+            >
               <ListItemIcon>
                 <InventoryIcon />
               </ListItemIcon>
-              <ListItemText primary="Products" />
+              <ListItemText 
+                primary="Products"
+                primaryTypographyProps={{
+                  fontWeight: 500,
+                }}
+              />
             </ListItemButton>
           </ListItem>
           {user?.role === 'admin' && (
             <ListItem disablePadding>
-              <ListItemButton onClick={() => navigate('/users')}>
+              <ListItemButton 
+                onClick={() => navigate('/users')}
+                sx={{
+                  borderRadius: '8px',
+                  mx: 1,
+                  mb: 0.5,
+                  '&:hover': {
+                    backgroundColor: '#F5F5F5',
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: '#E3F2FD',
+                    color: '#0A83BC',
+                    '&:hover': {
+                      backgroundColor: '#E3F2FD',
+                    },
+                    '& .MuiListItemIcon-root': {
+                      color: '#0A83BC',
+                    },
+                  },
+                }}
+              >
                 <ListItemIcon>
                   <GroupIcon />
                 </ListItemIcon>
-                <ListItemText primary="Users" />
+                <ListItemText 
+                  primary="Users"
+                  primaryTypographyProps={{
+                    fontWeight: 500,
+                  }}
+                />
               </ListItemButton>
             </ListItem>
           )}
         </List>
       </Drawer>
 
-      <Main open={open}>
+      <Main 
+        open={open}
+        sx={{
+          backgroundColor: '#FFFFFF',
+          overflowX: 'hidden',
+        }}
+      >
         <DrawerHeader />
-        <Outlet />
+        <Box sx={{ width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
+          <Outlet />
+        </Box>
       </Main>
     </Box>
   );

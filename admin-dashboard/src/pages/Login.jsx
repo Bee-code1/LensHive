@@ -55,91 +55,176 @@ export default function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'background.default',
-        padding: 2,
+        backgroundColor: '#FFFFFF',
+        padding: 3,
       }}
     >
-      <Card sx={{ maxWidth: 400, width: '100%' }}>
-        <CardContent sx={{ p: 4 }}>
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              LensHive Admin
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Enter your credentials to access the admin panel
-            </Typography>
-          </Box>
+      <Box sx={{ width: '100%', maxWidth: 400 }}>
+        {/* Logo and Title Section */}
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Box
+            component="img"
+            src="/lenshive_logo.png"
+            alt="LensHive Logo"
+            sx={{
+              width: 135,
+              height: 90,
+              objectFit: 'contain',
+              mb: 2,
+            }}
+          />
+          <Typography
+            variant="h5"
+            component="h1"
+            sx={{
+              fontWeight: 800,
+              color: '#0A83BC',
+              fontSize: '21px',
+            }}
+          >
+            LensHive
+          </Typography>
+        </Box>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          )}
+        {/* Login Card */}
+        <Card
+          sx={{
+            borderRadius: '16px',
+            border: '1px solid #E0E0E0',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+          }}
+        >
+          <CardContent sx={{ p: 3 }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
+                {error}
+              </Alert>
+            )}
 
-          <form onSubmit={handleLogin}>
-            <TextField
-              fullWidth
-              label="Email"
-              variant="outlined"
-              margin="normal"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              autoFocus
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailIcon color="action" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              fullWidth
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              variant="outlined"
-              margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
-              sx={{ mt: 3, mb: 2, py: 1.2 }}
-              disabled={loading}
-            >
-              {loading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                'Sign In'
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            <form onSubmit={handleLogin}>
+              <TextField
+                fullWidth
+                placeholder="Email"
+                variant="outlined"
+                margin="normal"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                autoFocus
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#F5F5F5',
+                    borderRadius: '8px',
+                    '& fieldset': {
+                      border: 'none',
+                    },
+                    '&:hover': {
+                      backgroundColor: '#EEEEEE',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#FFFFFF',
+                      '& fieldset': {
+                        border: '1px solid #0A83BC',
+                      },
+                    },
+                  },
+                  '& .MuiInputBase-input': {
+                    padding: '16px',
+                  },
+                }}
+              />
+              <TextField
+                fullWidth
+                placeholder="Password"
+                type={showPassword ? 'text' : 'password'}
+                variant="outlined"
+                margin="normal"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#F5F5F5',
+                    borderRadius: '8px',
+                    '& fieldset': {
+                      border: 'none',
+                    },
+                    '&:hover': {
+                      backgroundColor: '#EEEEEE',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#FFFFFF',
+                      '& fieldset': {
+                        border: '1px solid #0A83BC',
+                      },
+                    },
+                  },
+                  '& .MuiInputBase-input': {
+                    padding: '16px',
+                  },
+                }}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  py: 1.5,
+                  backgroundColor: '#0A83BC',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  '&:hover': {
+                    backgroundColor: '#075A85',
+                  },
+                  '&:disabled': {
+                    backgroundColor: '#0A83BC',
+                    opacity: 0.6,
+                  },
+                }}
+                disabled={loading}
+              >
+                {loading ? (
+                  <CircularProgress size={20} sx={{ color: '#FFFFFF' }} />
+                ) : (
+                  'Login'
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </Box>
     </Box>
   );
 }

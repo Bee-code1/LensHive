@@ -32,8 +32,10 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalOrders: 0,
@@ -61,7 +63,7 @@ export default function Dashboard() {
     { name: 'Accessories', value: 200 },
   ];
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const COLORS = ['#0A83BC', '#4CAF50', '#FF9800', '#81D4FA'];
 
   useEffect(() => {
     fetchStats();
@@ -70,15 +72,38 @@ export default function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const productsResponse = await fetch('http://localhost:8000/api/products/');
+      const token = localStorage.getItem('token');
+      
+      // Fetch products
+      const productsResponse = await fetch('http://localhost:8000/api/products/', {
+        headers: {
+          'Authorization': `Token ${token}`,
+        },
+      });
       const products = await productsResponse.json();
       
-      // Update with real and mock data
+      // Fetch users
+      let usersCount = 0;
+      try {
+        const usersResponse = await fetch('http://localhost:8000/api/auth/users/', {
+          headers: {
+            'Authorization': `Token ${token}`,
+          },
+        });
+        if (usersResponse.ok) {
+          const users = await usersResponse.json();
+          usersCount = users.length;
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+      
+      // Update with real data
       setStats({
         totalProducts: products.length,
-        totalOrders: 25,
-        totalUsers: 50,
-        totalRevenue: 15000,
+        totalOrders: 25, // Mock data - replace when orders API is available
+        totalUsers: usersCount,
+        totalRevenue: 15000, // Mock data - replace when revenue API is available
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -87,7 +112,12 @@ export default function Dashboard() {
 
   const fetchRecentData = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/products/');
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8000/api/products/', {
+        headers: {
+          'Authorization': `Token ${token}`,
+        },
+      });
       const products = await response.json();
       setRecentProducts(products.slice(0, 5));
       
@@ -103,22 +133,66 @@ export default function Dashboard() {
   };
 
   const StatCard = ({ title, value, icon: Icon, subtitle }) => (
-    <Card>
+    <Card
+      sx={{
+        borderRadius: '16px',
+        border: '1px solid #E0E0E0',
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+        transition: 'transform 0.2s, box-shadow 0.2s',
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: '0 6px 16px rgba(0, 0, 0, 0.1)',
+        },
+      }}
+    >
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Icon sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
+          <Box
+            sx={{
+              backgroundColor: '#E3F2FD',
+              borderRadius: '12px',
+              p: 1.5,
+              mr: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Icon sx={{ fontSize: 32, color: '#0A83BC' }} />
+          </Box>
           <Box>
-            <Typography variant="h6" component="div">
+            <Typography 
+              variant="h6" 
+              component="div"
+              sx={{ 
+                fontWeight: 600,
+                color: '#212121',
+                fontSize: '0.95rem',
+              }}
+            >
               {title}
             </Typography>
             {subtitle && (
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: '#757575',
+                  fontSize: '0.8rem',
+                }}
+              >
                 {subtitle}
               </Typography>
             )}
           </Box>
         </Box>
-        <Typography variant="h4" component="div">
+        <Typography 
+          variant="h4" 
+          component="div"
+          sx={{
+            fontWeight: 700,
+            color: '#0A83BC',
+          }}
+        >
           {value}
         </Typography>
       </CardContent>
@@ -126,12 +200,21 @@ export default function Dashboard() {
   );
 
   return (
-    <Box>
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">
+    <Box sx={{ width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, color: '#212121' }}>
           Dashboard Overview
         </Typography>
-        <Button variant="contained" startIcon={<TrendingUpIcon />}>
+        <Button 
+          variant="contained" 
+          startIcon={<TrendingUpIcon />}
+          sx={{
+            backgroundColor: '#0A83BC',
+            '&:hover': {
+              backgroundColor: '#075A85',
+            },
+          }}
+        >
           Generate Report
         </Button>
       </Box>
@@ -169,9 +252,22 @@ export default function Dashboard() {
 
         {/* Sales Chart */}
         <Grid item xs={12} md={8}>
-          <Card>
+          <Card
+            sx={{
+              borderRadius: '16px',
+              border: '1px solid #E0E0E0',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+            }}
+          >
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography 
+                variant="h6" 
+                gutterBottom
+                sx={{ 
+                  fontWeight: 600,
+                  color: '#212121',
+                }}
+              >
                 Sales Overview
               </Typography>
               <Box sx={{ height: 300 }}>
@@ -181,7 +277,7 @@ export default function Dashboard() {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="sales" stroke="#8884d8" />
+                    <Line type="monotone" dataKey="sales" stroke="#0A83BC" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </Box>
@@ -191,9 +287,22 @@ export default function Dashboard() {
 
         {/* Category Distribution */}
         <Grid item xs={12} md={4}>
-          <Card>
+          <Card
+            sx={{
+              borderRadius: '16px',
+              border: '1px solid #E0E0E0',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+            }}
+          >
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography 
+                variant="h6" 
+                gutterBottom
+                sx={{ 
+                  fontWeight: 600,
+                  color: '#212121',
+                }}
+              >
                 Product Categories
               </Typography>
               <Box sx={{ height: 300 }}>
@@ -222,9 +331,22 @@ export default function Dashboard() {
 
         {/* Recent Products */}
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card
+            sx={{
+              borderRadius: '16px',
+              border: '1px solid #E0E0E0',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+            }}
+          >
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography 
+                variant="h6" 
+                gutterBottom
+                sx={{ 
+                  fontWeight: 600,
+                  color: '#212121',
+                }}
+              >
                 Recent Products
               </Typography>
               <TableContainer component={Paper}>
@@ -253,9 +375,22 @@ export default function Dashboard() {
 
         {/* Recent Orders */}
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card
+            sx={{
+              borderRadius: '16px',
+              border: '1px solid #E0E0E0',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+            }}
+          >
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography 
+                variant="h6" 
+                gutterBottom
+                sx={{ 
+                  fontWeight: 600,
+                  color: '#212121',
+                }}
+              >
                 Recent Orders
               </Typography>
               <TableContainer component={Paper}>

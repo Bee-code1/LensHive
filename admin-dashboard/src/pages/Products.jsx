@@ -245,7 +245,8 @@ export default function Products() {
       field: 'description',
       headerName: 'Description',
       flex: 2,
-      minWidth: 300,
+      minWidth: 200,
+      maxWidth: 400,
     },
     {
       field: 'price',
@@ -277,19 +278,27 @@ export default function Products() {
   ];
 
   return (
-    <Box>
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Products</Typography>
+    <Box sx={{ width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, color: '#212121' }}>
+          Products
+        </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => handleOpen()}
+          sx={{
+            backgroundColor: '#0A83BC',
+            '&:hover': {
+              backgroundColor: '#075A85',
+            },
+          }}
         >
           Add Product
         </Button>
       </Box>
 
-      <Box sx={{ height: 600, width: '100%' }}>
+      <Box sx={{ height: 600, width: '100%', maxWidth: '100%', overflowX: 'auto' }}>
         <DataGrid
           rows={products}
           columns={columns}
@@ -302,6 +311,12 @@ export default function Products() {
             toolbar: {
               showQuickFilter: true,
               quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          sx={{
+            width: '100%',
+            '& .MuiDataGrid-root': {
+              border: 'none',
             },
           }}
         />
@@ -318,10 +333,21 @@ export default function Products() {
         </Alert>
       </Snackbar>
 
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog 
+        open={open} 
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            maxWidth: '600px',
+            width: '100%',
+          },
+        }}
+      >
         <DialogTitle>{editProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
         <form onSubmit={handleSubmit}>
-          <DialogContent>
+          <DialogContent sx={{ overflowX: 'hidden' }}>
             <TextField
               fullWidth
               label="Name"
@@ -378,7 +404,7 @@ export default function Products() {
             </Box>
             
             {/* Image Previews */}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2, maxWidth: '100%', overflowX: 'hidden' }}>
               {/* Existing Images */}
               {formData.existingImages.map((img, index) => (
                 <Box
