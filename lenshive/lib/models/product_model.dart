@@ -6,6 +6,7 @@ class Product {
   final double price;
   final String currency;
   final String imageUrl;
+  final List<String>? images; // All product images for carousel
   final String? category; // Men, Women, Kids
   final String? brand;
   final String? description;
@@ -25,6 +26,7 @@ class Product {
     required this.price,
     this.currency = 'PKR',
     required this.imageUrl,
+    this.images,
     this.category,
     this.brand,
     this.description,
@@ -41,17 +43,54 @@ class Product {
 
   /// Create Product from JSON
   factory Product.fromJson(Map<String, dynamic> json) {
+    // Helper function to safely convert to double
+    double? parseDouble(dynamic value) {
+      if (value == null) return null;
+      if (value is double) return value;
+      if (value is int) return value.toDouble();
+      if (value is String) {
+        try {
+          return double.parse(value);
+        } catch (e) {
+          return null;
+        }
+      }
+      return null;
+    }
+    
+    // Parse images array from backend
+    // Note: URLs are already converted to absolute by API service
+    List<String>? imagesList;
+    if (json['images'] != null && json['images'] is List) {
+      final imagesData = json['images'] as List;
+      imagesList = imagesData.map((img) {
+        if (img is Map) {
+          // Extract image_url from image object (already absolute URL from API service)
+          final imageUrl = img['image_url'] ?? img['image'];
+          if (imageUrl != null && imageUrl.toString().isNotEmpty) {
+            return imageUrl.toString();
+          }
+        }
+        return null;
+      }).where((url) => url != null).cast<String>().toList();
+    }
+    
+    // Get primary image URL
+    final primaryImage = json['primary_image'] ?? json['image_url'] ?? json['imageUrl'] ?? '';
+    final primaryImageUrl = primaryImage.toString();
+    
     return Product(
       id: json['id']?.toString() ?? '',
       name: json['name'] ?? '',
-      price: (json['price'] ?? 0).toDouble(),
+      price: parseDouble(json['price']) ?? 0.0,
       currency: json['currency'] ?? 'PKR',
-      imageUrl: json['image_url'] ?? json['imageUrl'] ?? json['primary_image'] ?? '',
+      imageUrl: primaryImageUrl.isNotEmpty ? primaryImageUrl : (imagesList?.isNotEmpty == true ? imagesList!.first : ''),
+      images: imagesList,
       category: json['category'],
       brand: json['brand'],
       description: json['description'],
       isAvailable: json['is_available'] ?? json['isAvailable'] ?? true,
-      stock: json['stock'],
+      stock: json['stock'] is int ? json['stock'] : (json['stock'] is String ? int.tryParse(json['stock']) : null),
       colors: json['colors'] != null 
           ? List<String>.from(json['colors']) 
           : null,
@@ -61,8 +100,10 @@ class Product {
       lensOptions: json['lens_options'] != null 
           ? List<String>.from(json['lens_options']) 
           : null,
-      rating: json['rating']?.toDouble(),
-      reviewCount: json['review_count'] ?? json['reviewCount'],
+      rating: parseDouble(json['rating']),
+      reviewCount: json['review_count'] is int 
+          ? json['review_count'] 
+          : (json['review_count'] is String ? int.tryParse(json['review_count']) : json['reviewCount']),
       isBestseller: json['is_bestseller'] ?? json['isBestseller'] ?? false,
       isNew: json['is_new'] ?? json['isNew'] ?? false,
     );
@@ -76,6 +117,7 @@ class Product {
       'price': price,
       'currency': currency,
       'image_url': imageUrl,
+      'images': images,
       'category': category,
       'brand': brand,
       'description': description,
@@ -98,6 +140,7 @@ class Product {
     double? price,
     String? currency,
     String? imageUrl,
+    List<String>? images,
     String? category,
     String? brand,
     String? description,
@@ -117,6 +160,7 @@ class Product {
       price: price ?? this.price,
       currency: currency ?? this.currency,
       imageUrl: imageUrl ?? this.imageUrl,
+      images: images ?? this.images,
       category: category ?? this.category,
       brand: brand ?? this.brand,
       description: description ?? this.description,

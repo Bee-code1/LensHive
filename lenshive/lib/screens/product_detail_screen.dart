@@ -38,6 +38,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with SingleTi
   bool isShippingExpanded = false;
   bool isSpecsExpanded = false;
   int currentImageIndex = 0;
+  late PageController _pageController;
   
   // Customize Lenses Dialog State
   String? selectedLensType;
@@ -61,6 +62,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with SingleTi
   @override
   void initState() {
     super.initState();
+    
+    // Initialize PageController for image carousel
+    _pageController = PageController(initialPage: 0);
     
     // Initialize animation controller
     _animationController = AnimationController(
@@ -104,6 +108,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with SingleTi
   
   @override
   void dispose() {
+    _pageController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -285,6 +290,43 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with SingleTi
   Widget _buildProductImage() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
+    // Get all images - use images list if available, otherwise use single imageUrl
+    final List<String> imageUrls = [];
+    if (widget.product.images != null && widget.product.images!.isNotEmpty) {
+      imageUrls.addAll(widget.product.images!);
+    } else if (widget.product.imageUrl.isNotEmpty) {
+      imageUrls.add(widget.product.imageUrl);
+    }
+    
+    // If no images, show placeholder
+    if (imageUrls.isEmpty) {
+      return Container(
+        width: double.infinity,
+        height: 300.r,
+        margin: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: isDark 
+              ? const Color(0xFF1C1C1E)
+              : const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Icon(
+            Icons.image_outlined,
+            size: 60.r,
+            color: Colors.grey.withOpacity(0.4),
+          ),
+        ),
+      );
+    }
+    
     return Container(
       width: double.infinity,
       height: 300.r,
@@ -304,32 +346,65 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with SingleTi
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.r),
-        child: widget.product.imageUrl.isNotEmpty
-            ? Hero(
-                tag: 'product-${widget.product.id}',
-                child: Image.network(
-                  widget.product.imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Center(
-                      child: Icon(
-                        Icons.image_outlined,
-                        size: 60.r,
-                        color: Colors.grey.withOpacity(0.4),
+        child: Stack(
+          children: [
+            // Image Carousel with PageView
+            PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  currentImageIndex = index;
+                });
+              },
+              itemCount: imageUrls.length,
+              itemBuilder: (context, index) {
+                return Hero(
+                  tag: 'product-${widget.product.id}-$index',
+                  child: Image.network(
+                    imageUrls[index],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 60.r,
+                          color: Colors.grey.withOpacity(0.4),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+            
+            // Image Indicators (dots) - only show if more than 1 image
+            if (imageUrls.length > 1)
+              Positioned(
+                bottom: 12.r,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    imageUrls.length,
+                    (index) => Container(
+                      width: 8.r,
+                      height: 8.r,
+                      margin: EdgeInsets.symmetric(horizontal: 4.r),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: currentImageIndex == index
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.4),
                       ),
-                    );
-                  },
-                ),
-              )
-            : Center(
-                child: Icon(
-                  Icons.image_outlined,
-                  size: 60.r,
-                  color: Colors.grey.withOpacity(0.4),
+                    ),
+                  ),
                 ),
               ),
+          ],
+        ),
       ),
     );
   }

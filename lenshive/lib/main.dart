@@ -9,6 +9,11 @@ void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
   
+  // Debug: Verify console is working
+  print('🔴 ==========================================');
+  print('🔴 MAIN FUNCTION CALLED - CONSOLE IS WORKING');
+  print('🔴 ==========================================');
+  
   // Wrap the app with ProviderScope to enable Riverpod
   runApp(
     const ProviderScope(

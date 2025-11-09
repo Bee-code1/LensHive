@@ -23,8 +23,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentNavIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    print('🟡 HomeScreen initState() called');
+    // Ensure products are loaded when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('🟡 HomeScreen postFrameCallback - calling loadProducts');
+      ref.read(homeProvider.notifier).loadProducts();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print('🟡 HomeScreen build() called');
     final homeState = ref.watch(homeProvider);
+    print('🟡 HomeScreen - homeState.isLoading: ${homeState.isLoading}');
+    print('🟡 HomeScreen - homeState.filteredProducts.length: ${homeState.filteredProducts.length}');
+    print('🟡 HomeScreen - homeState.errorMessage: ${homeState.errorMessage}');
     final homeNotifier = ref.read(homeProvider.notifier);
     final cartItemCount = ref.watch(cartItemCountProvider);
     
@@ -281,6 +296,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ? SliverToBoxAdapter(
                       child: SkeletonProductGrid(itemCount: 6),
                     )
+                  : homeState.errorMessage != null
+                      ? SliverFillRemaining(
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  size: 64.r,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                                SizedBox(height: 16.r),
+                                Text(
+                                  'Error loading products',
+                                  style: TextStyle(
+                                    fontSize: 16.r,
+                                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                                  ),
+                                ),
+                                SizedBox(height: 8.r),
+                                Text(
+                                  homeState.errorMessage ?? '',
+                                  style: TextStyle(
+                                    fontSize: 12.r,
+                                    color: Theme.of(context).textTheme.bodySmall?.color,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: 16.r),
+                                ElevatedButton(
+                                  onPressed: () => homeNotifier.refreshProducts(),
+                                  child: const Text('Retry'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                   : homeState.filteredProducts.isEmpty
                       ? SliverFillRemaining(
                           child: Center(
@@ -298,9 +350,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   style: TextStyle(
                                     fontSize: 16.r,
                                     color: Theme.of(context).textTheme.bodyLarge?.color,
-              ),
-            ),
-          ],
+                                  ),
+                                ),
+                                if (homeState.products.isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 8.r),
+                                    child: Text(
+                                      'Try selecting a different category',
+                                      style: TextStyle(
+                                        fontSize: 12.r,
+                                        color: Theme.of(context).textTheme.bodySmall?.color,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         )

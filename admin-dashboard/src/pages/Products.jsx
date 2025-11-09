@@ -15,6 +15,11 @@ import {
   FormControl,
   Alert,
   Snackbar,
+  FormControlLabel,
+  Switch,
+  Grid,
+  Autocomplete,
+  Chip,
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
@@ -25,6 +30,37 @@ import {
   StarBorder as StarBorderIcon,
 } from '@mui/icons-material';
 
+// Predefined options for dropdowns
+const FRAME_COLORS = [
+  'Black', 'Brown', 'Tortoise', 'Gray', 'Silver', 'Gold', 'Rose Gold',
+  'Blue', 'Red', 'Green', 'Purple', 'Pink', 'White', 'Navy', 'Beige',
+  'Obsidian', 'Matte Black', 'Gunmetal', 'Crystal', 'Transparent'
+];
+
+const SIZES = [
+  'Small', 'Medium', 'Large', 'Extra Large',
+  '48mm', '50mm', '52mm', '54mm', '56mm', '58mm',
+  'Narrow', 'Wide', 'Standard'
+];
+
+const LENS_OPTIONS = [
+  'Frame Only',
+  'Customize Lenses',
+  'Prescription Lenses',
+  'Blue Light Blocking',
+  'Photochromic',
+  'Polarized',
+  'Gradient',
+  'Mirror',
+  'Anti-Reflective Coating'
+];
+
+const CATEGORIES = [
+  'Men', 'Women', 'Kids', 'Unisex',
+  'Sunglasses', 'Reading Glasses', 'Computer Glasses',
+  'Sports', 'Fashion', 'Prescription', 'Safety'
+];
+
 export default function Products() {
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
@@ -34,7 +70,16 @@ export default function Products() {
     name: '',
     description: '',
     price: '',
+    currency: 'PKR',
     stock: '',
+    category: '',
+    brand: '',
+    frame_colors: [],
+    sizes: [],
+    lens_options: [],
+    is_bestseller: false,
+    is_new: false,
+    is_available: true,
     images: [],
     existingImages: [],
   });
@@ -87,11 +132,45 @@ export default function Products() {
         console.log('Fetched product details:', fullProduct); // Debug log
 
         setEditProduct(fullProduct);
+        
+        // Handle frame colors - use array if available, otherwise split string
+        let frameColorsArray = [];
+        if (fullProduct.colors && Array.isArray(fullProduct.colors) && fullProduct.colors.length > 0) {
+          frameColorsArray = fullProduct.colors;
+        } else if (fullProduct.frame_colors) {
+          frameColorsArray = fullProduct.frame_colors.split(',').map(c => c.trim()).filter(c => c);
+        }
+        
+        // Handle sizes - use array if available, otherwise split string
+        let sizesArray = [];
+        if (fullProduct.sizes && Array.isArray(fullProduct.sizes) && fullProduct.sizes.length > 0) {
+          sizesArray = fullProduct.sizes;
+        } else if (typeof fullProduct.sizes === 'string' && fullProduct.sizes) {
+          sizesArray = fullProduct.sizes.split(',').map(s => s.trim()).filter(s => s);
+        }
+        
+        // Handle lens options - use array if available, otherwise split string
+        let lensOptionsArray = [];
+        if (fullProduct.lens_options && Array.isArray(fullProduct.lens_options) && fullProduct.lens_options.length > 0) {
+          lensOptionsArray = fullProduct.lens_options;
+        } else if (typeof fullProduct.lens_options === 'string' && fullProduct.lens_options) {
+          lensOptionsArray = fullProduct.lens_options.split(',').map(o => o.trim()).filter(o => o);
+        }
+        
         setFormData({
-          name: fullProduct.name,
-          description: fullProduct.description,
-          price: fullProduct.price.toString(),
-          stock: fullProduct.stock.toString(),
+          name: fullProduct.name || '',
+          description: fullProduct.description || '',
+          price: fullProduct.price?.toString() || '',
+          currency: fullProduct.currency || 'PKR',
+          stock: fullProduct.stock?.toString() || '',
+          category: fullProduct.category || '',
+          brand: fullProduct.brand || '',
+          frame_colors: frameColorsArray,
+          sizes: sizesArray,
+          lens_options: lensOptionsArray,
+          is_bestseller: fullProduct.is_bestseller || false,
+          is_new: fullProduct.is_new || false,
+          is_available: fullProduct.is_available !== undefined ? fullProduct.is_available : true,
           images: [],
           existingImages: fullProduct.images || [],
         });
@@ -105,7 +184,16 @@ export default function Products() {
         name: '',
         description: '',
         price: '',
+        currency: 'PKR',
         stock: '',
+        category: '',
+        brand: '',
+        frame_colors: [],
+        sizes: [],
+        lens_options: [],
+        is_bestseller: false,
+        is_new: false,
+        is_available: true,
         images: [],
         existingImages: [],
       });
@@ -120,7 +208,16 @@ export default function Products() {
       name: '',
       description: '',
       price: '',
+      currency: 'PKR',
       stock: '',
+      category: '',
+      brand: '',
+      frame_colors: [],
+      sizes: [],
+      lens_options: [],
+      is_bestseller: false,
+      is_new: false,
+      is_available: true,
       images: [],
       existingImages: [],
     });
@@ -134,7 +231,17 @@ export default function Products() {
         formData[key].forEach(file => {
           formDataToSend.append('images', file);
         });
-      } else if (key !== 'existingImages' && formData[key] !== null) {
+      } else if (key === 'existingImages') {
+        // Skip existingImages, it's only for display
+      } else if (key === 'is_bestseller' || key === 'is_new' || key === 'is_available') {
+        // Handle boolean fields
+        formDataToSend.append(key, formData[key] ? 'true' : 'false');
+      } else if (key === 'frame_colors' || key === 'sizes' || key === 'lens_options') {
+        // Convert arrays to comma-separated strings
+        if (Array.isArray(formData[key]) && formData[key].length > 0) {
+          formDataToSend.append(key, formData[key].join(','));
+        }
+      } else if (formData[key] !== null && formData[key] !== '' && formData[key] !== undefined) {
         formDataToSend.append(key, formData[key]);
       }
     });
@@ -336,18 +443,19 @@ export default function Products() {
       <Dialog 
         open={open} 
         onClose={handleClose}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
         PaperProps={{
           sx: {
-            maxWidth: '600px',
+            maxWidth: '700px',
             width: '100%',
+            maxHeight: '90vh',
           },
         }}
       >
         <DialogTitle>{editProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
         <form onSubmit={handleSubmit}>
-          <DialogContent sx={{ overflowX: 'hidden' }}>
+          <DialogContent sx={{ overflowX: 'hidden', overflowY: 'auto', maxHeight: '70vh' }}>
             <TextField
               fullWidth
               label="Name"
@@ -366,15 +474,33 @@ export default function Products() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
             />
-            <TextField
-              fullWidth
-              label="Price"
-              margin="normal"
-              type="number"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              required
-            />
+            <Grid container spacing={2}>
+              <Grid item xs={8}>
+                <TextField
+                  fullWidth
+                  label="Price"
+                  margin="normal"
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  required
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <FormControl fullWidth margin="normal">
+                  <InputLabel>Currency</InputLabel>
+                  <Select
+                    value={formData.currency}
+                    label="Currency"
+                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                  >
+                    <MenuItem value="PKR">PKR</MenuItem>
+                    <MenuItem value="USD">USD</MenuItem>
+                    <MenuItem value="EUR">EUR</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
             <TextField
               fullWidth
               label="Stock"
@@ -384,6 +510,133 @@ export default function Products() {
               onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
               required
             />
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={formData.category}
+                label="Category"
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              >
+                {CATEGORIES.map(cat => (
+                  <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              fullWidth
+              label="Brand"
+              margin="normal"
+              value={formData.brand}
+              onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+              placeholder="e.g., Ray-Ban, Oakley"
+            />
+            <Autocomplete
+              multiple
+              options={FRAME_COLORS}
+              value={formData.frame_colors}
+              onChange={(event, newValue) => {
+                setFormData({ ...formData, frame_colors: newValue });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Frame Colors"
+                  margin="normal"
+                  helperText="Select one or more frame colors"
+                />
+              )}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    variant="outlined"
+                    label={option}
+                    {...getTagProps({ index })}
+                    key={option}
+                  />
+                ))
+              }
+            />
+            <Autocomplete
+              multiple
+              options={SIZES}
+              value={formData.sizes}
+              onChange={(event, newValue) => {
+                setFormData({ ...formData, sizes: newValue });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Sizes"
+                  margin="normal"
+                  helperText="Select one or more sizes"
+                />
+              )}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    variant="outlined"
+                    label={option}
+                    {...getTagProps({ index })}
+                    key={option}
+                  />
+                ))
+              }
+            />
+            <Autocomplete
+              multiple
+              options={LENS_OPTIONS}
+              value={formData.lens_options}
+              onChange={(event, newValue) => {
+                setFormData({ ...formData, lens_options: newValue });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Lens Options"
+                  margin="normal"
+                  helperText="Select one or more lens options"
+                />
+              )}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    variant="outlined"
+                    label={option}
+                    {...getTagProps({ index })}
+                    key={option}
+                  />
+                ))
+              }
+            />
+            <Box sx={{ mt: 2, mb: 1 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.is_bestseller}
+                    onChange={(e) => setFormData({ ...formData, is_bestseller: e.target.checked })}
+                  />
+                }
+                label="Bestseller"
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.is_new}
+                    onChange={(e) => setFormData({ ...formData, is_new: e.target.checked })}
+                  />
+                }
+                label="New Product"
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.is_available}
+                    onChange={(e) => setFormData({ ...formData, is_available: e.target.checked })}
+                  />
+                }
+                label="Available"
+              />
+            </Box>
             <Box sx={{ mt: 2, mb: 2 }}>
               <input
                 accept="image/*"

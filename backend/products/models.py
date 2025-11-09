@@ -7,6 +7,13 @@ class Product(models.Model):
         ('Women', 'Women'),
         ('Kids', 'Kids'),
         ('Unisex', 'Unisex'),
+        ('Sunglasses', 'Sunglasses'),
+        ('Reading Glasses', 'Reading Glasses'),
+        ('Computer Glasses', 'Computer Glasses'),
+        ('Sports', 'Sports'),
+        ('Fashion', 'Fashion'),
+        ('Prescription', 'Prescription'),
+        ('Safety', 'Safety'),
     ]
     
     name = models.CharField(max_length=200)
@@ -15,6 +22,11 @@ class Product(models.Model):
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(0)]
+    )
+    currency = models.CharField(
+        max_length=10,
+        default='PKR',
+        help_text="Currency code (e.g., PKR, USD)"
     )
     stock = models.IntegerField(
         default=0,
