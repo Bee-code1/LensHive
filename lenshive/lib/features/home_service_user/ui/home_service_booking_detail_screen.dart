@@ -101,7 +101,7 @@ class HomeServiceBookingDetailScreen extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.labelMedium,
                               ),
                               const Spacer(),
-                              _StatusPill(status: booking.status),
+                              StatusPill(booking.status),
                             ],
                           ),
                         ],
@@ -576,36 +576,6 @@ class _InfoRow extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Status pill widget
-class _StatusPill extends StatelessWidget {
-  final BookingStatus status;
-
-  const _StatusPill({required this.status});
-
-  Color _getColor() {
-    switch (status) {
-      case BookingStatus.requested:
-        return DesignTokens.warning;
-      case BookingStatus.scheduled:
-        return DesignTokens.primary;
-      case BookingStatus.inProgress:
-        return DesignTokens.primary;
-      case BookingStatus.completed:
-        return DesignTokens.success;
-      case BookingStatus.cancelled:
-        return DesignTokens.textSecondary;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return StatusPill(
-      label: status.label,
-      backgroundColor: _getColor(),
     );
   }
 }

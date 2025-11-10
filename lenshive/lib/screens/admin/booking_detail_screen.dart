@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../design/tokens.dart';
+import '../../features/home_service_user/domain/booking_models.dart';
 import '../../shared/widgets/status_pill.dart';
 
 /// Admin Home Service Booking Detail Screen - Placeholder
@@ -47,10 +48,7 @@ class BookingDetailScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
                           const Spacer(),
-                          StatusPill(
-                            label: 'Pending',
-                            backgroundColor: DesignTokens.warning,
-                          ),
+                          StatusPill(BookingStatus.requested),
                         ],
                       ),
                       SizedBox(height: DesignTokens.spaceLg),

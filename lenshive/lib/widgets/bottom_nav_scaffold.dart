@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../design/tokens.dart';
 
 /// Bottom Navigation Scaffold with 5 tabs
 /// SINGLE SOURCE OF TRUTH for bottom navigation
 /// Shows: Home, Customize, My Orders, Bookings, Account
+/// 
+/// Uses Material 3 NavigationBar with theme-driven styling.
+/// All colors/styles come from NavigationBarTheme in AppTheme.
 class BottomNavScaffold extends StatelessWidget {
   final Widget child;
 
@@ -61,70 +63,37 @@ class _BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedIndex = _calculateSelectedIndex(context);
     
-    return Container(
-      decoration: BoxDecoration(
-        color: DesignTokens.card,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            offset: const Offset(0, -2),
-            blurRadius: 8,
+    return SafeArea(
+      child: NavigationBar(
+        selectedIndex: selectedIndex,
+        onDestinationSelected: (index) => _onItemTapped(context, index),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.tune_outlined),
+            selectedIcon: Icon(Icons.tune),
+            label: 'Customize',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.shopping_bag_outlined),
+            selectedIcon: Icon(Icons.shopping_bag),
+            label: 'My Orders',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.event_outlined),
+            selectedIcon: Icon(Icons.event),
+            label: 'Bookings',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Account',
           ),
         ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: DesignTokens.spaceSm,
-            bottom: DesignTokens.spaceXs,
-          ),
-          child: BottomNavigationBar(
-            currentIndex: selectedIndex,
-            onTap: (index) => _onItemTapped(context, index),
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            selectedItemColor: DesignTokens.primary,
-            unselectedItemColor: DesignTokens.textSecondary,
-            selectedFontSize: 12,
-            unselectedFontSize: 12,
-            selectedLabelStyle: const TextStyle(
-              fontFamily: DesignTokens.fontFamily,
-              fontWeight: FontWeight.w600,
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontFamily: DesignTokens.fontFamily,
-              fontWeight: FontWeight.w500,
-            ),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.tune_outlined),
-                activeIcon: Icon(Icons.tune),
-                label: 'Customize',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_bag_outlined),
-                activeIcon: Icon(Icons.shopping_bag),
-                label: 'My Orders',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.event_outlined),
-                activeIcon: Icon(Icons.event),
-                label: 'Bookings',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
-                label: 'Account',
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -144,8 +144,6 @@ class _BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted = status == 'Completed';
-    
     return Card(
       child: InkWell(
         onTap: () {},
@@ -164,12 +162,7 @@ class _BookingCard extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  StatusPill(
-                    label: status,
-                    backgroundColor: isCompleted 
-                      ? DesignTokens.success 
-                      : DesignTokens.warning,
-                  ),
+                  StatusPill(parseBookingStatus(status)),
                 ],
               ),
               SizedBox(height: DesignTokens.spaceSm),

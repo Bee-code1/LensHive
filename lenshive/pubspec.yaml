@@ -49,7 +49,7 @@ dependencies:
   dio: ^5.4.0
   
   # Local storage for persistent data
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.2.3
   
   # Shimmer effect for skeleton loading
   shimmer: ^3.0.0

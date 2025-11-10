@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import '../constants/app_colors.dart';
 import '../providers/auth_provider.dart';
-import '../providers/theme_provider.dart';
+import '../theme/theme_mode_controller.dart';
 
-/// Profile Screen
+/// Profile Screen (Account Tab)
 /// Professional profile screen with user info, theme switching, and logout
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -14,8 +13,8 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
-    final isDarkMode = ref.watch(isDarkModeProvider);
-    final themeNotifier = ref.read(themeProvider.notifier);
+    final themeMode = ref.watch(themeModeProvider);
+    final isDarkMode = themeMode == ThemeMode.dark;
 
     return SafeArea(
         child: SingleChildScrollView(
@@ -26,7 +25,7 @@ class ProfileScreen extends ConsumerWidget {
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 32.r, horizontal: 24.r),
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30.r),
                     bottomRight: Radius.circular(30.r),
@@ -62,7 +61,7 @@ class ProfileScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 40.r,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),
@@ -77,7 +76,7 @@ class ProfileScreen extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 24.r,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                     ),
 
@@ -88,7 +87,7 @@ class ProfileScreen extends ConsumerWidget {
                       user?.email ?? '',
                       style: TextStyle(
                         fontSize: 14.r,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                     ),
                   ],
@@ -158,9 +157,9 @@ class ProfileScreen extends ConsumerWidget {
                     // Dark Mode Toggle
                     _buildThemeToggleCard(
                       context: context,
-                      isDarkMode: isDarkMode,
+                      themeMode: themeMode,
                       onChanged: (value) {
-                        themeNotifier.toggleTheme();
+                        ref.read(themeModeProvider.notifier).toggle();
                       },
                     ),
 
@@ -287,12 +286,12 @@ class ProfileScreen extends ConsumerWidget {
               width: 48.r,
               height: 48.r,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(
                 icon,
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
                 size: 24.r,
               ),
             ),
@@ -339,9 +338,11 @@ class ProfileScreen extends ConsumerWidget {
   /// Theme Toggle Card Widget
   Widget _buildThemeToggleCard({
     required BuildContext context,
-    required bool isDarkMode,
+    required ThemeMode themeMode,
     required ValueChanged<bool> onChanged,
   }) {
+    final isDarkMode = themeMode == ThemeMode.dark;
+    
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
@@ -353,12 +354,12 @@ class ProfileScreen extends ConsumerWidget {
             width: 48.r,
             height: 48.r,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
               isDarkMode ? Icons.dark_mode : Icons.light_mode,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
               size: 24.r,
             ),
           ),
@@ -393,7 +394,6 @@ class ProfileScreen extends ConsumerWidget {
             Switch(
               value: isDarkMode,
               onChanged: onChanged,
-              activeColor: AppColors.primary,
             ),
           ],
         ),
@@ -422,8 +422,8 @@ class ProfileScreen extends ConsumerWidget {
           }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red,
-          foregroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.error,
+          foregroundColor: Theme.of(context).colorScheme.onError,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
           ),

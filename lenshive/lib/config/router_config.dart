@@ -25,6 +25,10 @@ import '../models/product_model.dart';
 import '../widgets/bottom_nav_scaffold.dart';
 
 /// GoRouter configuration for app navigation
+/// 
+/// Note: initialLocation is set to '/' (splash) which handles auth state
+/// and redirects to either '/home' (authenticated) or '/login' (not authenticated).
+/// This ensures proper auth flow on app startup.
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   debugLogDiagnostics: false,

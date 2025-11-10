@@ -26,7 +26,6 @@ class _MyHomeServiceBookingsScreenState
     final bookingsState = ref.watch(myBookingsProvider);
 
     return Scaffold(
-      backgroundColor: DesignTokens.background,
       appBar: AppBar(
         title: const Text('My Home Service'),
         leading: IconButton(
@@ -168,12 +167,6 @@ class _MyHomeServiceBookingsScreenState
       onSelected: (selected) {
         setState(() => _selectedFilter = label);
       },
-      selectedColor: DesignTokens.primary,
-      backgroundColor: DesignTokens.card,
-      labelStyle: TextStyle(
-        color: isSelected ? DesignTokens.white : DesignTokens.textPrimary,
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-      ),
     );
   }
 
@@ -216,7 +209,7 @@ class _MyHomeServiceBookingsScreenState
               Icon(
                 Icons.event_note_outlined,
                 size: 64,
-                color: DesignTokens.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               SizedBox(height: DesignTokens.spaceLg),
               Text(
@@ -282,7 +275,7 @@ class _BookingCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: DesignTokens.spaceSm),
-                  _StatusPill(status: booking.status),
+                  StatusPill(booking.status),
                 ],
               ),
               SizedBox(height: DesignTokens.spaceMd),
@@ -375,36 +368,6 @@ class _BookingCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Status pill widget
-class _StatusPill extends StatelessWidget {
-  final BookingStatus status;
-
-  const _StatusPill({required this.status});
-
-  Color _getColor() {
-    switch (status) {
-      case BookingStatus.requested:
-        return DesignTokens.warning;
-      case BookingStatus.scheduled:
-        return DesignTokens.primary;
-      case BookingStatus.inProgress:
-        return DesignTokens.primary;
-      case BookingStatus.completed:
-        return DesignTokens.success;
-      case BookingStatus.cancelled:
-        return DesignTokens.textSecondary;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return StatusPill(
-      label: status.label,
-      backgroundColor: _getColor(),
     );
   }
 }

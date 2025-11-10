@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/home_provider.dart';
+import '../features/cart/providers/cart_providers.dart';
 import '../widgets/custom_search_bar.dart';
 import '../widgets/category_tabs.dart';
 import '../widgets/enhanced_product_card.dart';
 import '../widgets/skeleton_loaders.dart';
 import '../constants/app_colors.dart';
 import '../features/home_service/ui/nav_helpers.dart';
+import 'widgets/home_empty_state.dart';
 
 /// Home Screen - Main screen with product catalog
 /// Note: Navigation is handled by BottomNavScaffold, this screen only displays content
@@ -54,9 +56,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Text(
                       'LensHive',
                       style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         fontSize: 17.r,
                         fontWeight: FontWeight.bold,
                       ),
@@ -149,12 +149,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? AppColors.primaryDarkMode
-                                  : AppColors.primary,
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? AppColors.primaryDarkMode.withOpacity(0.8)
-                                  : AppColors.primaryLight,
+                              Theme.of(context).colorScheme.primary,
+                              Theme.of(context).colorScheme.primaryContainer,
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -168,12 +164,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Container(
                                 padding: EdgeInsets.all(12.r),
                                 decoration: BoxDecoration(
-                                  color: AppColors.white.withOpacity(0.2),
+                                  color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(12.r),
                                 ),
                                 child: Icon(
                                   Icons.quiz_rounded,
-                                  color: AppColors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                   size: 28.r,
                                 ),
                               ),
@@ -187,7 +183,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       style: TextStyle(
                                         fontSize: 17.r,
                                         fontWeight: FontWeight.bold,
-                                        color: AppColors.white,
+                                        color: Theme.of(context).colorScheme.onPrimary,
                                       ),
                                     ),
                                     SizedBox(height: 4.r),
@@ -195,7 +191,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       '3 quick questions • Personalized results',
                                       style: TextStyle(
                                         fontSize: 13.r,
-                                        color: AppColors.white.withValues(alpha: 0.9),
+                                        color: Theme.of(context).colorScheme.onPrimary,
                                       ),
                                     ),
                                   ],
@@ -203,7 +199,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ),
                               Icon(
                                 Icons.arrow_forward_ios_rounded,
-                                color: AppColors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 size: 18.r,
                               ),
                             ],
@@ -302,8 +298,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
 
-              SizedBox(height: 12.r),
-
               // Category Tabs
               SliverToBoxAdapter(
                 child: homeState.isLoading
@@ -340,27 +334,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: SkeletonProductGrid(itemCount: 6),
                     )
                   : homeState.filteredProducts.isEmpty
-                      ? SliverFillRemaining(
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.inventory_2_outlined,
-                                  size: 64.r,
-                                  color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
-                                ),
-                                SizedBox(height: 16.r),
-                                Text(
-                                  'No products found',
-                                  style: TextStyle(
-                                    fontSize: 16.r,
-                                    color: Theme.of(context).textTheme.bodyLarge?.color,
-              ),
-            ),
-          ],
-                            ),
-                          ),
+                      ? const SliverToBoxAdapter(
+                          child: HomeEmptyState(),
                         )
                       : SliverPadding(
                           padding: EdgeInsets.symmetric(
