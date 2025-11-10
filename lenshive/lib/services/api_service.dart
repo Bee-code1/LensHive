@@ -1,12 +1,40 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 
 /// API Service for Backend Communication
 /// Handles all HTTP requests to the LensHive backend API
 class ApiService {
-  // Base URL for API - Update this with your actual backend URL
-  static const String baseUrl = 'http://localhost:8000/api';
+  // Base URL for API - Automatically detects platform
+  static String get baseUrl {
+    if (kIsWeb) {
+      // Web/Chrome - use localhost
+      return 'http://localhost:8000/api';
+    }
+    
+    // For mobile/desktop platforms - use Platform from dart:io
+    // Note: dart:io is not available on web, but we already checked kIsWeb above
+    try {
+      // ignore: avoid_web_libraries_in_flutter
+      final platform = defaultTargetPlatform;
+      
+      if (platform == TargetPlatform.android) {
+        // Android Emulator - use 10.0.2.2 (maps to host's localhost)
+        // For physical device, change to your PC's IP address
+        return 'http://10.0.2.2:8000/api';
+      } else if (platform == TargetPlatform.iOS) {
+        // iOS Simulator - use localhost
+        return 'http://localhost:8000/api';
+      } else {
+        // Desktop (Windows, macOS, Linux) - use localhost
+        return 'http://localhost:8000/api';
+      }
+    } catch (e) {
+      // Fallback to localhost if platform detection fails
+      return 'http://localhost:8000/api';
+    }
+  }
   
   // API endpoints
   static const String loginEndpoint = '/auth/login/';
@@ -114,7 +142,7 @@ class ApiService {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
+          'Authorization': 'Token $token',
         },
       );
 

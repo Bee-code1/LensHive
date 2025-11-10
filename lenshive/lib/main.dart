@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'constants/app_theme.dart';
+import 'design/app_theme.dart';
 import 'providers/theme_provider.dart';
 import 'config/router_config.dart';
 
@@ -35,11 +35,9 @@ class MyApp extends ConsumerWidget {
           title: 'LensHive',
           debugShowCheckedModeBanner: false,
       
-          // Light theme configuration using AppTheme
-          theme: AppTheme.lightTheme,
-      
-          // Dark theme configuration using AppTheme
-          darkTheme: AppTheme.darkTheme,
+          // Stitch Visual System - Material 3 Themes
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
       
           // Use theme mode from provider
           themeMode: themeMode,

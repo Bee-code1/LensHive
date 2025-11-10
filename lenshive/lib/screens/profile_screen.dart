@@ -40,9 +40,9 @@ class ProfileScreen extends ConsumerWidget {
                       height: 100.r,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         border: Border.all(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           width: 4,
                         ),
                         boxShadow: [
@@ -103,10 +103,11 @@ class ProfileScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     // Account Settings Section
-                    _buildSectionTitle('Account Settings', isDarkMode),
+                    _buildSectionTitle(context, 'Account Settings', isDarkMode),
                     SizedBox(height: 12.r),
 
                     _buildSettingCard(
+                      context: context,
                       icon: Icons.person_outline,
                       title: 'Edit Profile',
                       subtitle: 'Update your personal information',
@@ -122,6 +123,20 @@ class ProfileScreen extends ConsumerWidget {
                     SizedBox(height: 12.r),
 
                     _buildSettingCard(
+                      context: context,
+                      icon: Icons.home_repair_service_outlined,
+                      title: 'My Home Service',
+                      subtitle: 'View and manage your bookings',
+                      isDarkMode: isDarkMode,
+                      onTap: () {
+                        context.push('/home-service/my');
+                      },
+                    ),
+
+                    SizedBox(height: 12.r),
+
+                    _buildSettingCard(
+                      context: context,
                       icon: Icons.lock_outline,
                       title: 'Change Password',
                       subtitle: 'Update your password',
@@ -137,11 +152,12 @@ class ProfileScreen extends ConsumerWidget {
                     SizedBox(height: 24.r),
 
                     // App Settings Section
-                    _buildSectionTitle('App Settings', isDarkMode),
+                    _buildSectionTitle(context, 'App Settings', isDarkMode),
                     SizedBox(height: 12.r),
 
                     // Dark Mode Toggle
                     _buildThemeToggleCard(
+                      context: context,
                       isDarkMode: isDarkMode,
                       onChanged: (value) {
                         themeNotifier.toggleTheme();
@@ -151,6 +167,7 @@ class ProfileScreen extends ConsumerWidget {
                     SizedBox(height: 12.r),
 
                     _buildSettingCard(
+                      context: context,
                       icon: Icons.notifications_none,
                       title: 'Notifications',
                       subtitle: 'Manage your notifications',
@@ -166,6 +183,7 @@ class ProfileScreen extends ConsumerWidget {
                     SizedBox(height: 12.r),
 
                     _buildSettingCard(
+                      context: context,
                       icon: Icons.language_outlined,
                       title: 'Language',
                       subtitle: 'English',
@@ -181,10 +199,11 @@ class ProfileScreen extends ConsumerWidget {
                     SizedBox(height: 24.r),
 
                     // Support Section
-                    _buildSectionTitle('Support', isDarkMode),
+                    _buildSectionTitle(context, 'Support', isDarkMode),
                     SizedBox(height: 12.r),
 
                     _buildSettingCard(
+                      context: context,
                       icon: Icons.help_outline,
                       title: 'Help & Support',
                       subtitle: 'Get help with the app',
@@ -200,6 +219,7 @@ class ProfileScreen extends ConsumerWidget {
                     SizedBox(height: 12.r),
 
                     _buildSettingCard(
+                      context: context,
                       icon: Icons.info_outline,
                       title: 'About',
                       subtitle: 'App version and information',
@@ -227,17 +247,17 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   /// Section Title Widget
-  Widget _buildSectionTitle(String title, bool isDarkMode) {
+  Widget _buildSectionTitle(BuildContext context, String title, bool isDarkMode) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
         padding: EdgeInsets.only(left: 8.r),
         child: Text(
           title,
-          style: TextStyle(
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
             fontSize: 16.r,
             fontWeight: FontWeight.w600,
-            color: isDarkMode ? Colors.white.withOpacity(0.7) : Colors.grey[600],
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ),
@@ -246,6 +266,7 @@ class ProfileScreen extends ConsumerWidget {
 
   /// Setting Card Widget
   Widget _buildSettingCard({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -255,21 +276,12 @@ class ProfileScreen extends ConsumerWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16.r),
-      child: Container(
-        padding: EdgeInsets.all(16.r),
-        decoration: BoxDecoration(
-          color: isDarkMode ? AppColors.cardDark : AppColors.cardLight,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: isDarkMode ? AppColors.shadowDark : AppColors.shadowLight,
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: EdgeInsets.all(16.r),
+          child: Row(
+            children: [
             // Icon
             Container(
               width: 48.r,
@@ -294,33 +306,31 @@ class ProfileScreen extends ConsumerWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontSize: 15.r,
                       fontWeight: FontWeight.w600,
-                      color: isDarkMode ? Colors.white : Colors.grey[900],
                     ),
                   ),
                   SizedBox(height: 4.r),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 13.r,
-                      color: isDarkMode
-                          ? Colors.white.withOpacity(0.6)
-                          : Colors.grey[600],
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Arrow Icon
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16.r,
-              color: isDarkMode ? Colors.white.withOpacity(0.4) : Colors.grey[400],
-            ),
-          ],
+              // Arrow Icon
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16.r,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -328,25 +338,17 @@ class ProfileScreen extends ConsumerWidget {
 
   /// Theme Toggle Card Widget
   Widget _buildThemeToggleCard({
+    required BuildContext context,
     required bool isDarkMode,
     required ValueChanged<bool> onChanged,
   }) {
-    return Container(
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.cardDark : AppColors.cardLight,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: isDarkMode ? AppColors.shadowDark : AppColors.shadowLight,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Icon
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: EdgeInsets.all(16.r),
+        child: Row(
+          children: [
+            // Icon
           Container(
             width: 48.r,
             height: 48.r,
@@ -370,33 +372,31 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 Text(
                   'Dark Mode',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontSize: 15.r,
                     fontWeight: FontWeight.w600,
-                    color: isDarkMode ? Colors.white : Colors.grey[900],
                   ),
                 ),
                 SizedBox(height: 4.r),
                 Text(
                   isDarkMode ? 'Switch to light theme' : 'Switch to dark theme',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize: 13.r,
-                    color: isDarkMode
-                        ? Colors.white.withOpacity(0.6)
-                        : Colors.grey[600],
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
             ),
           ),
 
-          // Toggle Switch
-          Switch(
-            value: isDarkMode,
-            onChanged: onChanged,
-            activeColor: AppColors.primary,
-          ),
-        ],
+            // Toggle Switch
+            Switch(
+              value: isDarkMode,
+              onChanged: onChanged,
+              activeColor: AppColors.primary,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -454,39 +454,31 @@ class ProfileScreen extends ConsumerWidget {
   Future<bool?> _showLogoutConfirmation(BuildContext context, bool isDarkMode) {
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDarkMode ? AppColors.cardDark : AppColors.cardLight,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Theme.of(dialogContext).colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.r),
         ),
         title: Text(
           'Logout',
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.grey[900],
+          style: Theme.of(dialogContext).textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           'Are you sure you want to logout?',
-          style: TextStyle(
-            color: isDarkMode ? Colors.white.withOpacity(0.7) : Colors.grey[700],
-          ),
+          style: Theme.of(dialogContext).textTheme.bodyMedium,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                color: isDarkMode ? Colors.white.withOpacity(0.7) : Colors.grey[600],
-              ),
-            ),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(dialogContext).colorScheme.error,
+              foregroundColor: Theme.of(dialogContext).colorScheme.onError,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.r),
               ),
@@ -502,8 +494,8 @@ class ProfileScreen extends ConsumerWidget {
   void _showAboutDialog(BuildContext context, bool isDarkMode) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDarkMode ? AppColors.cardDark : AppColors.cardLight,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Theme.of(dialogContext).colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.r),
         ),
@@ -517,8 +509,7 @@ class ProfileScreen extends ConsumerWidget {
             SizedBox(height: 16.r),
             Text(
               'LensHive',
-              style: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.grey[900],
+              style: Theme.of(dialogContext).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -529,25 +520,25 @@ class ProfileScreen extends ConsumerWidget {
           children: [
             Text(
               'Version 1.0.0',
-              style: TextStyle(
-                color: isDarkMode ? Colors.white.withOpacity(0.7) : Colors.grey[600],
+              style: Theme.of(dialogContext).textTheme.bodyMedium?.copyWith(
                 fontSize: 14.r,
+                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
               ),
             ),
             SizedBox(height: 12.r),
             Text(
               'Your premium eyewear shopping destination',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isDarkMode ? Colors.white.withOpacity(0.7) : Colors.grey[700],
+              style: Theme.of(dialogContext).textTheme.bodyMedium?.copyWith(
                 fontSize: 13.r,
+                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Close'),
           ),
         ],

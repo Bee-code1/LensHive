@@ -1,45 +1,53 @@
+# backend/lenshive_backend/settings.py
+
 from pathlib import Path
-from decouple import config
+from decouple import Config, RepositoryEnv
 import pymysql
 
-# Install PyMySQL as MySQLdb
+# Use PyMySQL as MySQLdb (so mysqlclient isn’t required on Windows)
 pymysql.install_as_MySQLdb()
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security settings
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this')
-DEBUG = config('DEBUG', default=True, cast=bool)
+# Force-load backend/.env explicitly (no guessing)
+env = Config(RepositoryEnv(BASE_DIR / '.env'))
 
-ALLOWED_HOSTS = ['*']
+# Security & debug
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-change-this')
+DEBUG = env('DEBUG', default=True, cast=bool)
+ALLOWED_HOSTS = ['*']  # dev convenience
 
-# Application definition
+# Apps
 INSTALLED_APPS = [
-    # Django core apps (admin removed - using custom admin dashboard)
+    # Django core (admin omitted intentionally)
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Third party apps
+
+    # Third-party
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    
+
     # Local apps
     'authentication.apps.AuthenticationConfig',
     'products.apps.ProductsConfig',
 ]
 
-# Media files configuration
+# Media (uploads) & static
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+STATIC_URL = 'static/'
+# (Optional for collectstatic in prod)
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # Must be before CommonMiddleware
+    'corsheaders.middleware.CorsMiddleware',   # keep before CommonMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -53,7 +61,7 @@ ROOT_URLCONF = 'lenshive_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [],  # add template dirs here if needed
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,16 +75,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'lenshive_backend.wsgi.application'
+# (If you ever add ASGI: ASGI_APPLICATION = 'lenshive_backend.asgi.application')
 
-# Database configuration
+# Database (MySQL via PyMySQL)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME', default='lenshive_db'),
-        'USER': config('DB_USER', default='root'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='3306'),
+        'NAME': env('DB_NAME', default='lenshive_db'),
+        'USER': env('DB_USER', default='root'),
+        'PASSWORD': env('DB_PASSWORD', default=''),
+        'HOST': env('DB_HOST', default='127.0.0.1'),  # TCP on Windows is safer than 'localhost'
+        'PORT': env('DB_PORT', default='3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
@@ -89,30 +98,21 @@ AUTH_USER_MODEL = 'authentication.User'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 6,
-        }
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+     'OPTIONS': {'min_length': 6}},
 ]
 
-# Internationalization
+# I18N
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
-
-# Default primary key field type
+# Default PK
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# REST Framework configuration
+# DRF
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -122,29 +122,14 @@ REST_FRAMEWORK = {
     ],
 }
 
-# URL Configuration
-APPEND_SLASH = True  # This ensures URLs end with a trailing slash
+# URL behavior
+APPEND_SLASH = True
 
-# CORS Settings - Allow Flutter app to connect
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# CORS (dev-friendly)
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
+CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
 CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
+    'accept', 'accept-encoding', 'authorization', 'content-type', 'dnt',
+    'origin', 'user-agent', 'x-csrftoken', 'x-requested-with',
 ]
-

@@ -1,31 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../core/router/routes.dart';
 import '../screens/splash_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/registration_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/product_detail_screen.dart';
+import '../screens/cart_screen.dart';
+import '../screens/checkout_screen.dart';
+import '../screens/customize_screen.dart';
+import '../screens/my_orders_screen.dart';
+import '../screens/admin/booking_list_screen.dart';
+import '../screens/admin/booking_detail_screen.dart';
 import '../features/quiz/steps/quiz_step1_basics.dart';
 import '../features/quiz/steps/quiz_step2_usage.dart';
 import '../features/quiz/steps/quiz_step3_preferences.dart';
 import '../features/quiz/result/new_recommendation_screen.dart';
 import '../features/quiz/models/questionnaire_models.dart';
+import '../features/home_service_user/ui/home_service_request_screen.dart';
+import '../features/home_service_user/ui/my_home_service_bookings_screen.dart';
+import '../features/home_service_user/ui/home_service_booking_detail_screen.dart';
 import '../models/product_model.dart';
+import '../widgets/bottom_nav_scaffold.dart';
 
 /// GoRouter configuration for app navigation
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
-  debugLogDiagnostics: false, // Disable debug logs for cleaner output
+  debugLogDiagnostics: false,
   routes: [
-    // Splash Screen - Always shown first on app start
+    // ==================== Splash & Auth (No Bottom Nav) ====================
     GoRoute(
       path: '/',
       name: 'splash',
       builder: (context, state) => const SplashScreen(),
     ),
-    
-    // Authentication Routes
     GoRoute(
       path: '/login',
       name: 'login',
@@ -37,21 +46,103 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const RegistrationScreen(),
     ),
     
-    // Home Screen
-    GoRoute(
-      path: '/home',
-      name: 'home',
-      builder: (context, state) => const HomeScreen(),
+    // ==================== User Routes (With Bottom Nav) ====================
+    ShellRoute(
+      builder: (context, state, child) {
+        return BottomNavScaffold(child: child);
+      },
+      routes: [
+        // Home tab
+        GoRoute(
+          path: '/home',
+          name: 'home',
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: const HomeScreen(),
+          ),
+        ),
+        
+        // Customize tab
+        GoRoute(
+          path: '/customize',
+          name: 'customize',
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: const CustomizeScreen(),
+          ),
+        ),
+        
+        // My Orders tab
+        GoRoute(
+          path: '/my-orders',
+          name: 'my_orders',
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: const MyOrdersScreen(),
+          ),
+        ),
+        
+        // Bookings tab (Home Service Bookings)
+        GoRoute(
+          path: Routes.bookings,
+          name: 'bookings',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: MyHomeServiceBookingsScreen(),
+          ),
+        ),
+        
+        // Account tab (formerly Profile)
+        GoRoute(
+          path: Routes.account,
+          name: 'account',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: ProfileScreen(),
+          ),
+        ),
+        
+        // Profile alias (backward compatibility)
+        GoRoute(
+          path: Routes.profile,
+          name: 'profile',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: ProfileScreen(),
+          ),
+        ),
+        
+        // Home Service - New Booking Form (with bottom nav)
+        GoRoute(
+          path: Routes.homeServiceNew,
+          name: 'home_service_new',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: HomeServiceRequestScreen(),
+          ),
+        ),
+        
+        // Home Service - My Bookings List (with bottom nav)
+        GoRoute(
+          path: Routes.homeServiceMy,
+          name: 'home_service_my',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: MyHomeServiceBookingsScreen(),
+          ),
+        ),
+      ],
     ),
     
-    // Profile Screen
+    // ==================== Other User Routes (No Bottom Nav) ====================
+    
+    // Cart (full screen, no bottom nav)
     GoRoute(
-      path: '/profile',
-      name: 'profile',
-      builder: (context, state) => const ProfileScreen(),
+      path: '/cart',
+      name: 'cart',
+      builder: (context, state) => const CartScreen(),
     ),
     
-    // Product Detail Screen
+    // Checkout (full screen, no bottom nav)
+    GoRoute(
+      path: '/checkout',
+      name: 'checkout',
+      builder: (context, state) => const CheckoutStubScreen(),
+    ),
+    
+    // Product Detail (full screen, no bottom nav)
     GoRoute(
       path: '/product/:id',
       name: 'product_detail',
@@ -61,10 +152,10 @@ final GoRouter appRouter = GoRouter(
       },
     ),
     
-    // Quiz Routes - Simplified 3-step process
+    // Quiz Routes (full screen, no bottom nav)
     GoRoute(
       path: '/quiz',
-      redirect: (context, state) => '/quiz/step1', // Redirect to first step
+      redirect: (context, state) => '/quiz/step1',
     ),
     GoRoute(
       path: '/quiz/step1',
@@ -87,6 +178,37 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) {
         final recommendation = state.extra as RecommendationData?;
         return NewRecommendationScreen(recommendation: recommendation);
+      },
+    ),
+    
+    // ==================== User Home Service Routes (No Bottom Nav) ====================
+    
+    // Home Service Booking Detail (no bottom nav - full screen for detail view)
+    GoRoute(
+      path: Routes.homeServiceDetail,
+      name: 'home_service_booking_detail',
+      builder: (context, state) {
+        final bookingId = state.pathParameters['id']!;
+        return HomeServiceBookingDetailScreen(bookingId: bookingId);
+      },
+    ),
+    
+    // ==================== Admin Routes (No Bottom Nav) ====================
+    
+    // Admin Home Service - Booking List
+    GoRoute(
+      path: '/admin/home-service',
+      name: 'admin_home_service',
+      builder: (context, state) => const BookingListScreen(),
+    ),
+    
+    // Admin Home Service - Booking Detail
+    GoRoute(
+      path: '/admin/home-service/:id',
+      name: 'admin_booking_detail',
+      builder: (context, state) {
+        final bookingId = state.pathParameters['id']!;
+        return BookingDetailScreen(bookingId: bookingId);
       },
     ),
   ],
@@ -118,4 +240,3 @@ final GoRouter appRouter = GoRouter(
     ),
   ),
 );
-
