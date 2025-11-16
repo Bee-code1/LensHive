@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'constants/app_theme.dart';
-import 'providers/theme_provider.dart';
+import 'theme/app_theme.dart';
+import 'theme/theme_mode_controller.dart';
 import 'config/router_config.dart';
 
 void main() async {
@@ -28,7 +28,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch theme mode from provider
-    final themeMode = ref.watch(themeProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     // Initialize ScreenUtil for responsive design
     return ScreenUtilInit(
@@ -40,11 +40,9 @@ class MyApp extends ConsumerWidget {
           title: 'LensHive',
           debugShowCheckedModeBanner: false,
       
-          // Light theme configuration using AppTheme
-          theme: AppTheme.lightTheme,
-      
-          // Dark theme configuration using AppTheme
-          darkTheme: AppTheme.darkTheme,
+          // Stitch Visual System - Material 3 Themes
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
       
           // Use theme mode from provider
           themeMode: themeMode,

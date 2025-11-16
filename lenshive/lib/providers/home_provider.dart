@@ -187,9 +187,3 @@ final selectedCategoryProvider = Provider<String>((ref) {
   return ref.watch(homeProvider).selectedCategory;
 });
 
-/// Provider for cart item count (mock for now)
-final cartItemCountProvider = Provider<int>((ref) {
-  // This will be replaced with actual cart state
-  return 2;
-});
-

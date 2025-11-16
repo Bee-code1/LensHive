@@ -3,15 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/home_provider.dart';
+import '../features/cart/providers/cart_providers.dart';
 import '../widgets/custom_search_bar.dart';
 import '../widgets/category_tabs.dart';
 import '../widgets/enhanced_product_card.dart';
 import '../widgets/skeleton_loaders.dart';
-import '../widgets/bottom_nav_bar.dart';
 import '../constants/app_colors.dart';
-import 'profile_screen.dart';
+import '../features/home_service/ui/nav_helpers.dart';
+import 'widgets/home_empty_state.dart';
 
 /// Home Screen - Main screen with product catalog
+/// Note: Navigation is handled by BottomNavScaffold, this screen only displays content
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -20,64 +22,16 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _currentNavIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    print('🟡 HomeScreen initState() called');
-    // Ensure products are loaded when screen initializes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('🟡 HomeScreen postFrameCallback - calling loadProducts');
-      ref.read(homeProvider.notifier).loadProducts();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    print('🟡 HomeScreen build() called');
     final homeState = ref.watch(homeProvider);
-    print('🟡 HomeScreen - homeState.isLoading: ${homeState.isLoading}');
-    print('🟡 HomeScreen - homeState.filteredProducts.length: ${homeState.filteredProducts.length}');
-    print('🟡 HomeScreen - homeState.errorMessage: ${homeState.errorMessage}');
     final homeNotifier = ref.read(homeProvider.notifier);
     final cartItemCount = ref.watch(cartItemCountProvider);
     
-  // (theme check removed — use Theme.of(context) inline where needed)
-
-    // Function to get the current screen based on index
-    Widget getScreen(int index) {
-      switch (index) {
-        case 0:
-          return _buildHomeScreen(homeState, homeNotifier, cartItemCount);
-        case 1:
-          return Center(child: Text('Customize Screen (Coming Soon)'));
-        case 2:
-          return Center(child: Text('My Orders Screen (Coming Soon)'));
-        case 3:
-          return Center(child: Text('Bookings Screen (Coming Soon)'));
-        case 4:
-          return const ProfileScreen();
-        default:
-          return _buildHomeScreen(homeState, homeNotifier, cartItemCount);
-      }
-    }
-    
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: getScreen(_currentNavIndex),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentNavIndex,
-        onTap: (index) {
-          setState(() {
-            _currentNavIndex = index;
-          });
-        },
-      ),
-    );
+    return _buildHomeContent(homeState, homeNotifier, cartItemCount);
   }
 
-  Widget _buildHomeScreen(HomeState homeState, HomeNotifier homeNotifier, int cartItemCount) {
+  Widget _buildHomeContent(HomeState homeState, HomeNotifier homeNotifier, int cartItemCount) {
     return SafeArea(
       child: RefreshIndicator(
         onRefresh: () => homeNotifier.refreshProducts(),
@@ -102,9 +56,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Text(
                       'LensHive',
                       style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         fontSize: 17.r,
                         fontWeight: FontWeight.bold,
                       ),
@@ -119,17 +71,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       clipBehavior: Clip.none,
                       children: [
                         IconButton(
+                          key: const Key('appbar_cart_button'),
                           icon: Icon(
                             Icons.shopping_cart_outlined,
                             color: Theme.of(context).iconTheme.color,
                             size: 26.r,
                           ),
                           onPressed: () {
-                            // Navigate to cart
+                            context.push('/cart');
                           },
                         ),
                         if (cartItemCount > 0)
                           Positioned(
+                            key: const Key('appbar_cart_badge'),
                             right: 6.r,
                             top: 6.r,
                             child: Container(
@@ -195,12 +149,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? AppColors.primaryDarkMode
-                                  : AppColors.primary,
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? AppColors.primaryDarkMode.withOpacity(0.8)
-                                  : AppColors.primaryLight,
+                              Theme.of(context).colorScheme.primary,
+                              Theme.of(context).colorScheme.primaryContainer,
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -214,12 +164,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Container(
                                 padding: EdgeInsets.all(12.r),
                                 decoration: BoxDecoration(
-                                  color: AppColors.white.withOpacity(0.2),
+                                  color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(12.r),
                                 ),
                                 child: Icon(
                                   Icons.quiz_rounded,
-                                  color: AppColors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                   size: 28.r,
                                 ),
                               ),
@@ -233,7 +183,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       style: TextStyle(
                                         fontSize: 17.r,
                                         fontWeight: FontWeight.bold,
-                                        color: AppColors.white,
+                                        color: Theme.of(context).colorScheme.onPrimary,
                                       ),
                                     ),
                                     SizedBox(height: 4.r),
@@ -241,7 +191,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       '3 quick questions • Personalized results',
                                       style: TextStyle(
                                         fontSize: 13.r,
-                                        color: AppColors.white.withOpacity(0.9),
+                                        color: Theme.of(context).colorScheme.onPrimary,
                                       ),
                                     ),
                                   ],
@@ -249,11 +199,98 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ),
                               Icon(
                                 Icons.arrow_forward_ios_rounded,
-                                color: AppColors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 size: 18.r,
                               ),
                             ],
                           ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Home Service CTA Card
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => goToNewHomeService(context),
+                      borderRadius: BorderRadius.circular(16.r),
+                      child: Container(
+                        padding: EdgeInsets.all(18.r),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.cardDark
+                              : AppColors.white,
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white.withOpacity(0.1)
+                                : Colors.grey.withOpacity(0.2),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(12.r),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: Icon(
+                                Icons.home_repair_service_outlined,
+                                color: AppColors.primary,
+                                size: 28.r,
+                              ),
+                            ),
+                            SizedBox(width: 16.r),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Book Home Service',
+                                    style: TextStyle(
+                                      fontSize: 17.r,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.white
+                                          : AppColors.textPrimaryLight,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4.r),
+                                  Text(
+                                    'Eye tests, fittings & repairs at your doorstep',
+                                    style: TextStyle(
+                                      fontSize: 13.r,
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.white.withOpacity(0.7)
+                                          : AppColors.textSecondaryLight,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white.withOpacity(0.5)
+                                  : AppColors.textSecondaryLight,
+                              size: 18.r,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -296,76 +333,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ? SliverToBoxAdapter(
                       child: SkeletonProductGrid(itemCount: 6),
                     )
-                  : homeState.errorMessage != null
-                      ? SliverFillRemaining(
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  size: 64.r,
-                                  color: Theme.of(context).colorScheme.error,
-                                ),
-                                SizedBox(height: 16.r),
-                                Text(
-                                  'Error loading products',
-                                  style: TextStyle(
-                                    fontSize: 16.r,
-                                    color: Theme.of(context).textTheme.bodyLarge?.color,
-                                  ),
-                                ),
-                                SizedBox(height: 8.r),
-                                Text(
-                                  homeState.errorMessage ?? '',
-                                  style: TextStyle(
-                                    fontSize: 12.r,
-                                    color: Theme.of(context).textTheme.bodySmall?.color,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(height: 16.r),
-                                ElevatedButton(
-                                  onPressed: () => homeNotifier.refreshProducts(),
-                                  child: const Text('Retry'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
                   : homeState.filteredProducts.isEmpty
-                      ? SliverFillRemaining(
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.inventory_2_outlined,
-                                  size: 64.r,
-                                  color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
-                                ),
-                                SizedBox(height: 16.r),
-                                Text(
-                                  'No products found',
-                                  style: TextStyle(
-                                    fontSize: 16.r,
-                                    color: Theme.of(context).textTheme.bodyLarge?.color,
-                                  ),
-                                ),
-                                if (homeState.products.isNotEmpty)
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 8.r),
-                                    child: Text(
-                                      'Try selecting a different category',
-                                      style: TextStyle(
-                                        fontSize: 12.r,
-                                        color: Theme.of(context).textTheme.bodySmall?.color,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
+                      ? const SliverToBoxAdapter(
+                          child: HomeEmptyState(),
                         )
                       : SliverPadding(
                           padding: EdgeInsets.symmetric(
