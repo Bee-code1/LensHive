@@ -271,8 +271,6 @@ This project is licensed under the MIT License.
 
 For support, email your-email@example.com or create an issue in the repository.
 
----
 
-**Made with ❤️ for LensHive FYP Project**
 
 
